@@ -10,6 +10,7 @@ Requirements
 ============
 * pyserial - For serial communications to the NanoVNA
 * jinja2 - For HTML templates
+* pandas
 
 Links
 =====

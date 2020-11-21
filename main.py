@@ -1,6 +1,8 @@
 from http.server import BaseHTTPRequestHandler
 from urllib import parse
 from jinja2 import Template
+import numpy as np
+import pandas as pd
 
 template_text = """
     <head>
