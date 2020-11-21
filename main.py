@@ -11,6 +11,14 @@ template_sweep_text = """
 <html>
     <head>
         <title>NanoVNA Control Panel</title>
+        <style>
+        table {
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        </style>
     </head>
     <body>
         <h1>NanoVNA Control Panel</h1>
@@ -25,7 +33,7 @@ template_sweep_text = """
             <button>Sweep</button>
         </form>
         <table>
-            <caption>VSWR sweep</caption>
+            <caption>VSWR Sweep</caption>
             <thead>
                 <tr>
                     {% for freq in freqs %}
@@ -41,12 +49,14 @@ template_sweep_text = """
                 </tr>
             </tbody>
         </table>
+        <p>NanoVNA voltage is {{ voltage }} volts</p>
     </body>
 </html>
 """
 
 template_sweep = Template(template_sweep_text)
 ser = None
+
 
 def connect_if_necessary():
     global ser
@@ -56,6 +66,7 @@ def connect_if_necessary():
         ser = serial.Serial('/dev/cu.usbmodem4001')
     else:
         print("Connection is good")
+
 
 state = {
     "start_frequency_mhz": 28,
@@ -98,12 +109,13 @@ def sweep():
             print("Range error")
             raise Exception("Frequency range error")
 
-        print("Starting to talk to NanoVNA")
-
         nv.run_command(ser, "info")
+        # Set the sweep range
         nv.run_command(ser, "sweep " + str(start_frequency) + " " + str(end_frequency))
-
-        # Collect the frequenies
+        # Get the battery voltage in volts
+        vbat_lines = nv.run_command(ser, "vbat")
+        vbat = float(vbat_lines[0][:-2]) / 1000
+        # Collect the frequencies of the sweep
         lines = nv.run_command(ser, "frequencies")
         frequency_list = [float(line) for line in lines]
         # Make the VSWR data
@@ -114,21 +126,31 @@ def sweep():
         df = pd.DataFrame(vswr_list, index=frequency_list)
         # Re-sample using the start/end/step provided by the user.  Linear
         # interpolation is automatically used
-        df1 = df.reindex(np.linspace(start_frequency, end_frequency - step_frequency, step_count)).interpolate()
+        frequency_space = np.linspace(start_frequency, end_frequency - step_frequency, step_count)
+        df1 = df.reindex(frequency_space).interpolate()
         # Pull out index values
         result_frequencies = df1.index.tolist()
         # Pull out VSWR values
         result_vswrs = [column[0] for column in df1.values.tolist()]
+        # Find the lowest value
+        min_vswr = min(result_vswrs)
+        # Determine which index the minimum belongs to
+        min_index = result_vswrs.index(min_vswr)
         # Format
         formatted_frequencies = ["{:.03f}".format(f / 1000000.0) for f in result_frequencies]
         formatted_vswrs = ["{:.02f}".format(v) for v in result_vswrs]
+        # Tweak the minimum VSWR with the best match annotation
+        formatted_frequencies[min_index] = formatted_frequencies[min_index] + " best match"
+        formatted_vswrs[min_index] = formatted_vswrs[min_index] + " best match"
+        formatted_voltage = "{:.01f}".format(vbat)
 
         a = {
             'freqs': formatted_frequencies,
             'vswrs': formatted_vswrs,
             'start_frequency_mhz': state["start_frequency_mhz"],
             'end_frequency_mhz': state["end_frequency_mhz"],
-            'step_frequency_mhz': state["step_frequency_mhz"]
+            'step_frequency_mhz': state["step_frequency_mhz"],
+            'voltage': formatted_voltage
         }
 
         response = make_response(template_sweep.render(a))

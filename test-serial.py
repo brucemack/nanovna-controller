@@ -22,6 +22,7 @@ nv.run_command(ser, "sweep " + str(start_frequency) + " " + str(end_frequency))
 lines = nv.run_command(ser, "frequencies")
 frequency_list = [float(line) for line in lines]
 print(frequency_list)
+frequency_space = np.linspace(start_frequency, end_frequency - step_frequency, step_count)
 
 # Make the VSWR data
 rc_list = nv.get_complex_data(ser)
@@ -35,8 +36,7 @@ df = pd.DataFrame(vswr_list, index=frequency_list)
 print(df)
 # Re-sample using the start/end/step provided by the user.  Linear
 # interpolation is automatically used
-
-df1 = df.reindex(np.linspace(start_frequency, end_frequency - step_frequency, step_count)).interpolate()
+df1 = df.reindex(frequency_space).interpolate()
 print(df1)
 v = [column[0] for column in df1.values.tolist()]
 print(v)
