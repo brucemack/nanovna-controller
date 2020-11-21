@@ -7,19 +7,19 @@ This program was designed by N1FMV and KC1FSZ.
 Runnning Instructions
 =====================
 There are two parameters:
-* The serial (comm) port to use
+* The serial (comm) port to use when communicating with the NanoVNA.
 * The TCP port to listen on for HTTP requests.  Defaults to 8080.
 
 NanoVNA Technial Information
 ============================
-The data command returns a list of reflection coefficients in real/imaginary pairs.  Each line contains one coefficient and the real/imaginary parts are space-delimited.
+The data command causes the NanoVNA to return a list of reflection coefficients in real/imaginary pairs.  Each line contains one coefficient and the real/imaginary parts are space-delimited.
 
 Gamma is the magnitude of the complex reflect coefficient.
 
 VSWR = (1+Gamma)/(1-Gamma)
 
-Requirements
-============
+Building Requirements
+=====================
 * pyserial - For serial communications to the NanoVNA
 * jinja2 - For HTML templates
 * pandas - Needed for data interpolation
