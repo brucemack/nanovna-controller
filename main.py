@@ -22,7 +22,7 @@ template_sweep_text = """
     </head>
     <body>
         <h1>NanoVNA Control Panel</h1>
-        <p>The NanoVNA is connected.</p>
+        <p>The NanoVNA is connected</p>
         <form method="post" action="/">
             <label for="s1">Start Frequency in Megahertz</label>
             <input type="text" id="s1" name="start_frequency_mhz" value="{{ start_frequency_mhz }}"/>
