@@ -33,7 +33,7 @@ template_sweep_text = """
             <button>Sweep</button>
         </form>
         <table>
-            <caption>VSWR Sweep</caption>
+            <caption>VSWR Sweep Results</caption>
             <thead>
                 <tr>
                     {% for freq in freqs %}
