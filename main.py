@@ -106,9 +106,12 @@ class GetHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(message.encode('utf-8'))
 
+listen_host = "localhost"
+listen_port = 8080
+
+
 
 if __name__ == '__main__':
     from http.server import HTTPServer
-    server = HTTPServer(('localhost', 8080), GetHandler)
-    print('Starting server, use <Ctrl-C> to stop')
+    server = HTTPServer((listen_host, listen_port), GetHandler)
     server.serve_forever()
