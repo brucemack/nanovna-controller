@@ -7,20 +7,28 @@ from flask import Flask, request, make_response, send_from_directory, send_file,
 import json
 import logging
 import configparser
+import sys
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
+# Get static location
+if len(sys.argv) < 2:
+    logging.error("Argument error")
+    sys.exit(-1)
+
+base_dir = sys.argv[1]
+logging.info("NanoVNA Controller")
+logging.info("Base Directory is " + base_dir)
+
 # Load .ini file
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(base_dir + "/config.ini")
 static_config = config["DEFAULT"]
 
-logging.info("NanoVNA Controller")
 logging.info("Working directory is " + static_config["workdir"])
 
 user_config = { }
-
 
 def load_user_config():
     global user_config
@@ -44,22 +52,25 @@ def save_user_config():
         logging.info("Saved user configuration")
         logging.info(user_config)
 
+
 # Initial load of configuration properties
 load_user_config()
 
+nanovna = nv.Nanovna()
+
 # Flask routes
 app = Flask(__name__)
-nanovna = nv.Nanovna()
+
 
 @app.route("/static/<filename>")
 def root2(filename):
-    return send_file("static/" + filename)
+    return send_file(base_dir + "/static/" + filename)
 
 
 @app.route("/")
 def root():
     """ Sends static home page. """
-    return send_file("static/index.html")
+    return send_file(base_dir + "/static/index.html")
 
 
 @app.route("/api/config", methods=["GET", "POST"])
@@ -75,8 +86,6 @@ def config():
 
 @app.route("/api/calibrate", methods=["GET"])
 def calibrate():
-
-    print(request.args)
 
     try:
         # Get connected to the NanoVNA
@@ -127,6 +136,32 @@ def calibrate():
 
     except Exception as ex:
         logging.error("Error in calibration", exc_info=True)
+        result = {
+            "error": True,
+            "message": ex.args[0]
+        }
+        return jsonify(result)
+
+
+@app.route("/api/status", methods=["GET"])
+def status():
+
+    try:
+        # Get connected to the NanoVNA
+        nanovna.connect_if_necessary(user_config["port"])
+        # Execute various status commands
+        vbat_lines = nanovna.run_command("vbat")
+        vbat = float(vbat_lines[0][:-2]) / 1000
+        version_lines = nanovna.run_command("version")
+
+        result = {
+            "version": version_lines[0],
+            "voltage": vbat
+        }
+        return result
+
+    except Exception as ex:
+        logging.error("Error in status", exc_info=True)
         result = {
             "error": True,
             "message": ex.args[0]

@@ -133,3 +133,15 @@ function do_calibration(panel, step) {
             console.info("Step done")
         });
 }
+
+function do_status_refresh(panel) {
+    // Load up the sweep table user server-side data
+    $.get("/api/status")
+        .done(function(data) {
+            if (data.error) {
+                $(panel).find(".result-div").html("<p role='alert'>" + data.message + "</p>")
+            } else {
+                $(panel).find(".result-div").html(template_2(data))
+            }
+        });
+}

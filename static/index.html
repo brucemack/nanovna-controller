@@ -57,17 +57,25 @@
                 </tbody>
             </table>
         </script>
+        <script id="template_2" type="text/x-handlebars-template">
+            <div>
+                <p>Battery voltage: {{voltage}}</p>
+                <p>NanovNA version: {{version}}</p>
+            </div>
+        </script>
         <script>
 $.ajaxSetup({ cache: false });
 
 var template_0;
 var template_1;
+var template_2;
 
 $(document).ready(function() {
 
     // Compile the templates
     template_0 = Handlebars.compile($("#template_0").html());
     template_1 = Handlebars.compile($("#template_1").html());
+    template_2 = Handlebars.compile($("#template_2").html());
 
     setupTabNavigation($(".tabs"))
 
@@ -80,11 +88,13 @@ $(document).ready(function() {
     $("#sweep-tab .go").click(function(event) {
         do_sweep($("#sweep-tab"))
     });
-    // Action button on sweep tab
+
+    // Action button on complex sweep tab
     $("#complex-tab .go").click(function(event) {
         do_complex_sweep($("#complex-tab"))
     });
-    // Input on administrative tab
+
+    // Input on administration tab
     $("#administration-tab .port-input").blur(function(event) {
         var v = $(this).val()
         $.post("/api/config",{ "port": v })
@@ -104,6 +114,11 @@ $(document).ready(function() {
     // Fill in the initial config values
     $.get("/api/config",function(data) {
         $("#administration-tab .port-input").val(data.port);
+    });
+
+    // Action button on status tab
+    $("#status-tab .go").click(function(event) {
+        do_status_refresh($("#status-tab"))
     });
 });
         </script>
@@ -137,6 +152,13 @@ $(document).ready(function() {
                       id="administration-control"
                       tabindex="-1">
                 Administration
+              </button>
+              <button role="tab"
+                      aria-selected="false"
+                      aria-controls="status-tab"
+                      id="status-control"
+                      tabindex="-1">
+                Status
               </button>
               <button role="tab"
                       aria-selected="false"
@@ -180,7 +202,6 @@ $(document).ready(function() {
                  aria-labelledby="complex-control"
                  hidden="">
                  <h1>Complex Sweep Panel</h1>
-                 <p>The NanoVNA is connected</p>
                  <form class="control-form">
                      <label for="s24">Calibration Preset</label>
                      <select class="s4" id="s24" tabindex="0" name="cal_preset">
@@ -243,9 +264,19 @@ $(document).ready(function() {
             </div>
             <div tabindex="0"
                  role="tabpanel"
+                 id="status-tab"
+                 aria-labelledby="status-control"
+                 hidden="">
+                <h1>Status Panel</h1>
+                <button class="go">Refresh Status</button>
+                <div class="result-div"></div>
+            </div>
+            <div tabindex="0"
+                 role="tabpanel"
                  id="about-tab"
                  aria-labelledby="about-control"
                  hidden="">
+                 <p>This is version 1.</p>
                  <p>The NanoVNA control panel was designed by N1FMV and KC1FSZ.</p>
                  <p>Details on the NanoVNA can be found <a href="https://nanovna.com/">here</a>.</p>
                  <p>Details on the NanoVNA command language can be found <a href="https://4ham.ru/wp-content/uploads/2020/05/NanoVNA_Console_Commands_Dec-9-19-1.pdf">here</a>.</p>
