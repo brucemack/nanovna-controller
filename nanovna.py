@@ -5,14 +5,23 @@ import logging
 class Nanovna:
 
     ser = None
+    port = None
 
     def connect_if_necessary(self, port):
         """ Opens a connection to the NanoVNA if necessary. """
+        # Look for the case where the port is changing
+        if port != self.port:
+            self.port = None
+            if self.ser is not None:
+                self.ser.close()
+                self.ser = None
+        # Look for the case were we need to open the port
         if self.ser is None or not self.ser.isOpen():
             logging.info("Connection was not open yet: " + port)
             try:
                 # Open the serial port to the NanoVNA
                 self.ser = serial.Serial(port, timeout=2, write_timeout=2)
+                self.port = port
                 logging.info("Connection is good")
             except Exception as ex:
                 logging.error("Unable to open connection", exc_info=True)

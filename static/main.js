@@ -116,3 +116,20 @@ function do_complex_sweep(panel) {
             }
         });
 }
+
+function do_calibration(panel, step) {
+
+    // Get the form inputs
+    var params = {
+        cal_preset: $(panel).find(".s4").val(),
+        start_frequency_mhz: $(panel).find(".s1").val(),
+        end_frequency_mhz: $(panel).find(".s2").val(),
+        step: step
+    }
+
+    // Load up the sweep table user server-side data
+    $.get("/api/calibrate", params)
+        .done(function(data) {
+            console.info("Step done")
+        });
+}

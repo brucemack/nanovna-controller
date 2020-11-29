@@ -6,22 +6,48 @@ import nanovna as nv
 from flask import Flask, request, make_response, send_from_directory, send_file, jsonify
 import json
 import logging
+import configparser
 
-ser = None
-
-config = {
-    "listen_host": "localhost",
-    "listen_port": 8080
-}
-
-user_config = {
-    "port": "/dev/cu.usbmodem4001",
-}
-
-
-
-
+# Configure logging
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
+
+# Load .ini file
+config = configparser.ConfigParser()
+config.read('config.ini')
+static_config = config["DEFAULT"]
+
+logging.info("NanoVNA Controller")
+logging.info("Working directory is " + static_config["workdir"])
+
+user_config = { }
+
+
+def load_user_config():
+    global user_config
+    try:
+        with open(static_config["workdir"] + "/userconfig.json") as f:
+            user_config = json.load(f)
+            logging.info("Loaded user configuration")
+            logging.info(user_config)
+    except Exception as ex:
+        logging.warning("Unable to read user configuration")
+        user_config = {}
+
+    # Program some defaults
+    if not ("port" in user_config):
+        user_config["port"] = "COM3"
+
+
+def save_user_config():
+    with open(static_config["workdir"] + "/userconfig.json", "w") as f:
+        json.dump(user_config, f)
+        logging.info("Saved user configuration")
+        logging.info(user_config)
+
+# Initial load of configuration properties
+load_user_config()
+
+# Flask routes
 app = Flask(__name__)
 nanovna = nv.Nanovna()
 
@@ -32,7 +58,81 @@ def root2(filename):
 
 @app.route("/")
 def root():
+    """ Sends static home page. """
     return send_file("static/index.html")
+
+
+@app.route("/api/config", methods=["GET", "POST"])
+def config():
+    """ Allows the client to read and write the user configuration parameters. """
+    if request.method == "POST":
+        for item in request.form.items():
+            user_config[item[0]] = item[1]
+            logging.info("Changed config value " + item[0] + "=" + item[1])
+        save_user_config()
+    return jsonify(user_config)
+
+
+@app.route("/api/calibrate", methods=["GET"])
+def calibrate():
+
+    print(request.args)
+
+    try:
+        # Get connected to the NanoVNA
+        nanovna.connect_if_necessary(user_config["port"])
+
+        # Process request parameters
+        if request.args.get("cal_preset").strip() == "":
+            raise Exception("Calibration preset is missing")
+        cal_preset = int(request.args.get("cal_preset"))
+        if request.args.get("start_frequency_mhz").strip() == "":
+            raise Exception("Start frequency is missing")
+        try:
+            start_frequency = int(float(request.args.get("start_frequency_mhz")) * 1000000)
+        except Exception as ex:
+            raise Exception("Invalid start frequency: " + str(ex))
+        if request.args.get("end_frequency_mhz").strip() == "":
+            raise Exception("End frequency is missing")
+        try:
+            end_frequency = int(float(request.args.get("end_frequency_mhz")) * 1000000)
+        except Exception as ex:
+            raise Exception("Invalid end frequency: " + str(ex))
+        if start_frequency >= end_frequency:
+            raise Exception("Frequency range was not valid")
+
+        # On step 0 we set the range and reset
+        if request.args["step"] == "0":
+            logging.info("Calibration step 0")
+            # Set the sweep range
+            nanovna.run_command("sweep " + str(start_frequency) + " " + str(end_frequency))
+            # Reset
+            nanovna.run_command("cal reset")
+            # Cal short
+            nanovna.run_command("cal short")
+        elif request.args["step"] == "1":
+            logging.info("Calibration step 1")
+            # Cal open
+            nanovna.run_command("cal open")
+        elif request.args["step"] == "2":
+            logging.info("Calibration step 2")
+            # Cal load
+            nanovna.run_command("cal load")
+            # Cal done
+            nanovna.run_command("cal done")
+            # Save
+            nanovna.run_command("save " + request.args["cal_preset"])
+
+        return "OK"
+
+    except Exception as ex:
+        logging.error("Error in calibration", exc_info=True)
+        result = {
+            "error": True,
+            "message": ex.args[0]
+        }
+        return jsonify(result)
+
 
 @app.route("/api/sweep", methods=["GET", "POST"])
 def sweep():
@@ -130,5 +230,4 @@ def sweep():
 
 
 if __name__ == "__main__":
-    app.run(host=config["listen_host"], port=config["listen_port"])
-
+    app.run(host=static_config["listenhost"], port=static_config["listenport"])

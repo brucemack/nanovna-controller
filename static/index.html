@@ -76,10 +76,6 @@ $(document).ready(function() {
         return false
     });
 
-    $(".calibration-button").click(function(event){
-        //console.log("Calibration button")
-    });
-
     // Action button on sweep tab
     $("#sweep-tab .go").click(function(event) {
         do_sweep($("#sweep-tab"))
@@ -87,6 +83,27 @@ $(document).ready(function() {
     // Action button on sweep tab
     $("#complex-tab .go").click(function(event) {
         do_complex_sweep($("#complex-tab"))
+    });
+    // Input on administrative tab
+    $("#administration-tab .port-input").blur(function(event) {
+        var v = $(this).val()
+        $.post("/api/config",{ "port": v })
+    });
+
+    // Action buttons on calibration
+    $("#calibration-tab .button-0").click(function(event) {
+        do_calibration($("#calibration-tab"), 0)
+    });
+    $("#calibration-tab .button-1").click(function(event) {
+        do_calibration($("#calibration-tab"), 1)
+    });
+    $("#calibration-tab .button-2").click(function(event) {
+        do_calibration($("#calibration-tab"), 2)
+    });
+
+    // Fill in the initial config values
+    $.get("/api/config",function(data) {
+        $("#administration-tab .port-input").val(data.port);
     });
 });
         </script>
@@ -193,25 +210,25 @@ $(document).ready(function() {
                     <h1>Calibration Panel</h1>
                     <form class="control-form">
                         <label for="s33">Calibration Preset</label>
-                        <select id="s33" tabindex="0">
+                        <select class="s4" id="s33" tabindex="0" name="cal_preset">
+                            <option>0</option>
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
                             <option>4</option>
-                            <option>5</option>
                         </select>
                         <br/>
                         <label for="s31">Start Frequency in Megahertz</label>
-                        <input tabindex="0" type="text" id="s31" name="start_frequency_mhz" value="7"/>
+                        <input class="s1" tabindex="0" type="text" id="s31" name="start_frequency_mhz"/>
                         <br/>
                         <label for="s32">End Frequency in Megahertz</label>
-                        <input tabindex="0" type="text" id="s32" name="end_frequency_mhz" value="7.3"/>
+                        <input class="s2" tabindex="0" type="text" id="s32" name="end_frequency_mhz"/>
                         <br/>
-                        <button tabindex="0" class="calibration-button">Attach Short and Press When Ready</button>
+                        <button tabindex="0" class="button-0">Attach Short and Press When Ready</button>
                         <br/>
-                        <button tabindex="0" class="calibration-button">Attach Open and Press When Ready</button>
+                        <button tabindex="0" class="button-1">Attach Open and Press When Ready</button>
                         <br/>
-                        <button tabindex="0" class="calibration-button">Attach Load and Press When Ready</button>
+                        <button tabindex="0" class="button-2">Attach Load and Press When Ready</button>
                     </form>
                 </div>
             </div>
@@ -222,7 +239,7 @@ $(document).ready(function() {
                  hidden="">
                  <h1>Administration Panel</h1>
                  <label for="s41">Serial Port</label>
-                 <input type="text" id="s41" name="serial_port" value="com3"/>
+                 <input class="port-input" type="text" id="s41" name="serial_port"/>
             </div>
             <div tabindex="0"
                  role="tabpanel"
