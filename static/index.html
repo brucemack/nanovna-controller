@@ -30,15 +30,44 @@
                 </tbody>
             </table>
         </script>
+        <script id="template_1" type="text/x-handlebars-template">
+            <table>
+                <caption>
+                    Complex Sweep Result
+                </caption>
+                <thead>
+                    <td></td>
+                    {{#each headers}}
+                    <th>
+                        {{this}}
+                    </th>
+                    {{/each}}
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                    <tr>
+                        <th>{{this.header}}</th>
+                        {{#each this.cells}}
+                        <td>
+                            {{this}}
+                        </td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </script>
         <script>
 $.ajaxSetup({ cache: false });
 
 var template_0;
+var template_1;
 
 $(document).ready(function() {
 
     // Compile the templates
     template_0 = Handlebars.compile($("#template_0").html());
+    template_1 = Handlebars.compile($("#template_1").html());
 
     setupTabNavigation($(".tabs"))
 
@@ -52,8 +81,12 @@ $(document).ready(function() {
     });
 
     // Action button on sweep tab
-    $(".sweep_go").click(function(event) {
+    $("#sweep-tab .go").click(function(event) {
         do_sweep($("#sweep-tab"))
+    });
+    // Action button on sweep tab
+    $("#complex-tab .go").click(function(event) {
+        do_complex_sweep($("#complex-tab"))
     });
 });
         </script>
@@ -105,7 +138,7 @@ $(document).ready(function() {
                  <h1>Sweep Panel</h1>
                  <form class="control-form">
                      <label for="s14">Calibration Preset</label>
-                     <select id="s14" tabindex="0" name="cal_preset">
+                     <select class="s4" id="s14" tabindex="0" name="cal_preset">
                          <option>0</option>
                          <option>1</option>
                          <option>2</option>
@@ -113,16 +146,17 @@ $(document).ready(function() {
                          <option>4</option>
                      </select>
                      <label for="s11">Start Frequency in Megahertz</label>
-                     <input type="text" id="s11" name="start_frequency_mhz"/>
+                     <input class="s1" type="text" id="s11" name="start_frequency_mhz"/>
                      <label for="s12">End Frequency in Megahertz</label>
-                     <input type="text" id="s12" name="end_frequency_mhz"/>
+                     <input class="s2" type="text" id="s12" name="end_frequency_mhz"/>
                      <label for="s13">Step in Megahertz</label>
-                     <input type="text" id="s13" name="step_frequency_mhz"/>
-                     <button class="sweep_go">Sweep</button>
+                     <input class="s3" type="text" id="s13" name="step_frequency_mhz"/>
+                     <button class="go">Sweep</button>
                  </form>
                  <div class="result-div"></div>
             </div>
 
+            <!-- ===== Complex VSWR Sweep Panel ============================================= -->
             <div tabindex="0"
                  role="tabpanel"
                  id="complex-tab"
@@ -130,92 +164,26 @@ $(document).ready(function() {
                  hidden="">
                  <h1>Complex Sweep Panel</h1>
                  <p>The NanoVNA is connected</p>
-                 <form method="get" action="/nanovna/demo1">
+                 <form class="control-form">
                      <label for="s24">Calibration Preset</label>
-                     <select id="s24" tabindex="0">
+                     <select class="s4" id="s24" tabindex="0" name="cal_preset">
+                         <option>0</option>
                          <option>1</option>
                          <option>2</option>
                          <option>3</option>
                          <option>4</option>
-                         <option>5</option>
                      </select>
                      <label for="s21">Start Frequency in Megahertz</label>
-                     <input type="text" id="s21" name="start_frequency_mhz" value="7"/>
+                     <input class="s1" type="text" id="s21" name="start_frequency_mhz"/>
                      <label for="s22">End Frequency in Megahertz</label>
-                     <input type="text" id="s22" name="end_frequency_mhz" value="7.3"/>
+                     <input class="s2" type="text" id="s22" name="end_frequency_mhz"/>
                      <label for="s23">Step in Megahertz</label>
-                     <input type="text" id="s23" name="step_frequency_mhz" value="0.025"/>
-                     <button>Sweep</button>
+                     <input class="s3" type="text" id="s23" name="step_frequency_mhz"/>
+                     <button class="go">Sweep</button>
                  </form>
-                 <table>
-                     <caption>Complex Sweep Results</caption>
-                     <thead>
-                         <tr>
-                             <td></td>
-                             <th scope="col">7.000</th>
-                             <th scope="col">7.025</th>
-                             <th scope="col">7.050</th>
-                             <th scope="col">7.075</th>
-                             <th scope="col">7.100</th>
-                             <th scope="col">7.125</th>
-                             <th scope="col">7.150</th>
-                             <th scope="col">7.175</th>
-                             <th scope="col">7.200</th>
-                             <th scope="col">7.225</th>
-                             <th scope="col">7.250</th>
-                             <th scope="col">7.275</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <th scope="row">VSWR</th>
-                             <td> 2.46</td>
-                             <td> 2.30</td>
-                             <td> 2.14</td>
-                             <td> 1.97</td>
-                             <td> 1.83</td>
-                             <td> 1.68</td>
-                             <td> 1.53</td>
-                             <td> 1.42</td>
-                             <td> 1.31</td>
-                             <td> 1.19</td>
-                             <td> 1.19</td>
-                             <td> 1.19</td>
-                         </tr>
-                         <tr>
-                            <th scope="row">Real Impedance</th>
-                            <td> 52</td>
-                            <td> 52</td>
-                            <td> 53</td>
-                            <td> 56</td>
-                            <td> 55</td>
-                            <td> 52</td>
-                            <td> 46</td>
-                            <td> 46</td>
-                            <td> 43</td>
-                            <td> 45</td>
-                            <td> 46</td>
-                            <td> 47</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Imaginary Impedance</th>
-                            <td> 16</td>
-                            <td> 12</td>
-                            <td> 13</td>
-                            <td> 12</td>
-                            <td> 11</td>
-                            <td> 9</td>
-                            <td> 7</td>
-                            <td> 5</td>
-                            <td> -2</td>
-                            <td> -6</td>
-                            <td> -10</td>
-                            <td> -11</td>
-                        </tr>
-                    </tbody>
-                 </table>
-                 <p>NanoVNA voltage is 4.2 volts</p>
+                 <div class="result-div"></div>
             </div>
+
             <div tabindex="0"
                  role="tabpanel"
                  id="calibration-tab"

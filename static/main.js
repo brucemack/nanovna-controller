@@ -79,10 +79,10 @@ function do_sweep(panel) {
 
     // Get the form inputs
     var params = {
-        cal_preset: $(panel).find("#s14").val(),
-        start_frequency_mhz: $(panel).find("#s11").val(),
-        end_frequency_mhz: $(panel).find("#s12").val(),
-        step_frequency_mhz: $(panel).find("#s13").val()
+        cal_preset: $(panel).find(".s4").val(),
+        start_frequency_mhz: $(panel).find(".s1").val(),
+        end_frequency_mhz: $(panel).find(".s2").val(),
+        step_frequency_mhz: $(panel).find(".s3").val()
     }
 
     // Load up the sweep table user server-side data
@@ -92,6 +92,27 @@ function do_sweep(panel) {
                 $(panel).find(".result-div").html("<p role='alert'>" + data.message + "</p>")
             } else {
                 $(panel).find(".result-div").html(template_0(data))
+            }
+        });
+}
+
+function do_complex_sweep(panel) {
+
+    // Get the form inputs
+    var params = {
+        cal_preset: $(panel).find(".s4").val(),
+        start_frequency_mhz: $(panel).find(".s1").val(),
+        end_frequency_mhz: $(panel).find(".s2").val(),
+        step_frequency_mhz: $(panel).find(".s3").val()
+    }
+
+    // Load up the sweep table user server-side data
+    $.get("/api/sweep", params)
+        .done(function(data) {
+            if (data.error) {
+                $(panel).find(".result-div").html("<p role='alert'>" + data.message + "</p>")
+            } else {
+                $(panel).find(".result-div").html(template_1(data))
             }
         });
 }

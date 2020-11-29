@@ -109,6 +109,7 @@ def sweep():
             "headers": ["{:.03f}".format(f / 1000000.0) for f in result_frequencies],
             "rows": [
                 {
+                    "header": "VSWR",
                     "cells": ["{:.02f}".format(v) for v in result_vswrs]
                 }
             ]
