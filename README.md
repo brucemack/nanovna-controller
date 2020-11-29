@@ -24,6 +24,11 @@ Building Requirements
 * pandas - Needed for data interpolation
 * Flask - Needed for web serving
 
+PyInstaller
+==========
+pip install PyInstaller
+pyinstaller --onefile main.py
+
 Links
 =====
 * Prototype UI: https://brucemack.github.io/nanovna 
