@@ -1,7 +1,9 @@
-from jinja2 import Template
+"""
+NanoVNA Controller
+Designed by N1FMV and KC1FZ
+"""
 import numpy as np
 import pandas as pd
-import serial
 import nanovna as nv
 from flask import Flask, request, make_response, send_from_directory, send_file, jsonify
 import json
@@ -9,15 +11,17 @@ import logging
 import configparser
 import sys
 
-# Configure logging
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
-
-# Get static location
 if len(sys.argv) < 2:
     logging.error("Argument error")
     sys.exit(-1)
 
+# Get static location
 base_dir = sys.argv[1]
+
+# Configure logging
+logging.basicConfig(filename=base_dir + "/log.txt", format='%(asctime)s %(message)s', level=logging.INFO)
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
 logging.info("NanoVNA Controller")
 logging.info("Base Directory is " + base_dir)
 
@@ -27,8 +31,10 @@ config.read(base_dir + "/config.ini")
 static_config = config["DEFAULT"]
 
 logging.info("Working directory is " + static_config["workdir"])
+logging.info("Listen port is " + static_config["listenport"])
 
 user_config = { }
+
 
 def load_user_config():
     global user_config

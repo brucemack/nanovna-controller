@@ -1,9 +1,15 @@
+<!--
+NanoVNA Controller
+Copyright (C) 2020
+Designed by N1FVMV and KC1FSZ
+-->
 <html>
     <head>
         <link rel="stylesheet" href="static/main.css"/>
         <script src="static/jquery-3.5.1.min.js"></script>
         <script src="static/handlebars.min-v4.7.6.js"></script>
         <script src="static/main.js"></script>
+
         <!-- Handlebars Templates -->
         <script id="template_0" type="text/x-handlebars-template">
             <table>
@@ -222,6 +228,7 @@ $(document).ready(function() {
                  <div class="result-div"></div>
             </div>
 
+            <!-- ===== Calibration Panel ================================================ -->
             <div tabindex="0"
                  role="tabpanel"
                  id="calibration-tab"
@@ -253,6 +260,9 @@ $(document).ready(function() {
                     </form>
                 </div>
             </div>
+
+            <!-- ===== Administration Panel ================================================ -->
+
             <div tabindex="0"
                  role="tabpanel"
                  id="administration-tab"
@@ -262,6 +272,9 @@ $(document).ready(function() {
                  <label for="s41">Serial Port</label>
                  <input class="port-input" type="text" id="s41" name="serial_port"/>
             </div>
+
+            <!-- ===== Status Panel ================================================ -->
+
             <div tabindex="0"
                  role="tabpanel"
                  id="status-tab"
@@ -271,7 +284,10 @@ $(document).ready(function() {
                 <button class="go">Refresh Status</button>
                 <div class="result-div"></div>
             </div>
-            <div tabindex="0"
+
+            <!-- ===== About Panel ================================================ -->
+
+           <div tabindex="0"
                  role="tabpanel"
                  id="about-tab"
                  aria-labelledby="about-control"
@@ -281,6 +297,7 @@ $(document).ready(function() {
                  <p>Details on the NanoVNA can be found <a href="https://nanovna.com/">here</a>.</p>
                  <p>Details on the NanoVNA command language can be found <a href="https://4ham.ru/wp-content/uploads/2020/05/NanoVNA_Console_Commands_Dec-9-19-1.pdf">here</a>.</p>
             </div>
-        </div>          
+        </div>
+
     </body>
 </html>
