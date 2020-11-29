@@ -1,0 +1,270 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="static/main.css"/>
+        <script src="static/jquery-3.5.1.min.js"></script>
+        <script src="static/handlebars.min-v4.7.6.js"></script>
+        <script src="static/main.js"></script>
+        <!-- Handlebars Templates -->
+        <script id="template_0" type="text/x-handlebars-template">
+            <table>
+                <caption>
+                    VSWR Sweep Result
+                </caption>
+                <thead>
+                    {{#each headers}}
+                    <th>
+                        {{this}}
+                    </th>
+                    {{/each}}
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                    <tr>
+                        {{#each this.cells}}
+                        <td>
+                            {{this}}
+                        </td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </script>
+        <script>
+$.ajaxSetup({ cache: false });
+
+var template_0;
+
+$(document).ready(function() {
+
+    // Compile the templates
+    template_0 = Handlebars.compile($("#template_0").html());
+
+    setupTabNavigation($(".tabs"))
+
+    // Shut off normal form submit logic
+    $(".control-form").submit(function(event) {
+        return false
+    });
+
+    $(".calibration-button").click(function(event){
+        //console.log("Calibration button")
+    });
+
+    // Action button on sweep tab
+    $(".sweep_go").click(function(event) {
+        do_sweep($("#sweep-tab"))
+    });
+});
+        </script>
+    </head>
+    <body>
+        <div class="tabs" tabindex="0">
+            <div class="tablist" role="tablist" aria-label="Navigation Tabs">
+              <button role="tab"
+                      aria-selected="true"
+                      aria-controls="sweep-tab"
+                      id="sweep-control">
+                Sweep
+              </button>
+              <button role="tab"
+                      aria-selected="false"
+                      aria-controls="complex-tab"
+                      id="complex-control"
+                      tabindex="-1">
+                Complex Sweep
+              </button>
+              <button role="tab"
+                      aria-selected="false"
+                      aria-controls="calibration-tab"
+                      id="calibration-control"
+                      tabindex="-1">
+                Calibration
+              </button>
+              <button role="tab"
+                      aria-selected="false"
+                      aria-controls="administration-tab"
+                      id="administration-control"
+                      tabindex="-1">
+                Administration
+              </button>
+              <button role="tab"
+                      aria-selected="false"
+                      aria-controls="about-tab"
+                      id="about-control"
+                      tabindex="-1">
+                About
+              </button>
+            </div>
+
+            <!-- ===== VSWR Sweep Panel ================================================== -->
+            <div tabindex="0"
+                 role="tabpanel"
+                 id="sweep-tab"
+                 aria-labelledby="sweep-control">
+                 <h1>Sweep Panel</h1>
+                 <form class="control-form">
+                     <label for="s14">Calibration Preset</label>
+                     <select id="s14" tabindex="0" name="cal_preset">
+                         <option>0</option>
+                         <option>1</option>
+                         <option>2</option>
+                         <option>3</option>
+                         <option>4</option>
+                     </select>
+                     <label for="s11">Start Frequency in Megahertz</label>
+                     <input type="text" id="s11" name="start_frequency_mhz"/>
+                     <label for="s12">End Frequency in Megahertz</label>
+                     <input type="text" id="s12" name="end_frequency_mhz"/>
+                     <label for="s13">Step in Megahertz</label>
+                     <input type="text" id="s13" name="step_frequency_mhz"/>
+                     <button class="sweep_go">Sweep</button>
+                 </form>
+                 <div class="result-div"></div>
+            </div>
+
+            <div tabindex="0"
+                 role="tabpanel"
+                 id="complex-tab"
+                 aria-labelledby="complex-control"
+                 hidden="">
+                 <h1>Complex Sweep Panel</h1>
+                 <p>The NanoVNA is connected</p>
+                 <form method="get" action="/nanovna/demo1">
+                     <label for="s24">Calibration Preset</label>
+                     <select id="s24" tabindex="0">
+                         <option>1</option>
+                         <option>2</option>
+                         <option>3</option>
+                         <option>4</option>
+                         <option>5</option>
+                     </select>
+                     <label for="s21">Start Frequency in Megahertz</label>
+                     <input type="text" id="s21" name="start_frequency_mhz" value="7"/>
+                     <label for="s22">End Frequency in Megahertz</label>
+                     <input type="text" id="s22" name="end_frequency_mhz" value="7.3"/>
+                     <label for="s23">Step in Megahertz</label>
+                     <input type="text" id="s23" name="step_frequency_mhz" value="0.025"/>
+                     <button>Sweep</button>
+                 </form>
+                 <table>
+                     <caption>Complex Sweep Results</caption>
+                     <thead>
+                         <tr>
+                             <td></td>
+                             <th scope="col">7.000</th>
+                             <th scope="col">7.025</th>
+                             <th scope="col">7.050</th>
+                             <th scope="col">7.075</th>
+                             <th scope="col">7.100</th>
+                             <th scope="col">7.125</th>
+                             <th scope="col">7.150</th>
+                             <th scope="col">7.175</th>
+                             <th scope="col">7.200</th>
+                             <th scope="col">7.225</th>
+                             <th scope="col">7.250</th>
+                             <th scope="col">7.275</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tr>
+                             <th scope="row">VSWR</th>
+                             <td> 2.46</td>
+                             <td> 2.30</td>
+                             <td> 2.14</td>
+                             <td> 1.97</td>
+                             <td> 1.83</td>
+                             <td> 1.68</td>
+                             <td> 1.53</td>
+                             <td> 1.42</td>
+                             <td> 1.31</td>
+                             <td> 1.19</td>
+                             <td> 1.19</td>
+                             <td> 1.19</td>
+                         </tr>
+                         <tr>
+                            <th scope="row">Real Impedance</th>
+                            <td> 52</td>
+                            <td> 52</td>
+                            <td> 53</td>
+                            <td> 56</td>
+                            <td> 55</td>
+                            <td> 52</td>
+                            <td> 46</td>
+                            <td> 46</td>
+                            <td> 43</td>
+                            <td> 45</td>
+                            <td> 46</td>
+                            <td> 47</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Imaginary Impedance</th>
+                            <td> 16</td>
+                            <td> 12</td>
+                            <td> 13</td>
+                            <td> 12</td>
+                            <td> 11</td>
+                            <td> 9</td>
+                            <td> 7</td>
+                            <td> 5</td>
+                            <td> -2</td>
+                            <td> -6</td>
+                            <td> -10</td>
+                            <td> -11</td>
+                        </tr>
+                    </tbody>
+                 </table>
+                 <p>NanoVNA voltage is 4.2 volts</p>
+            </div>
+            <div tabindex="0"
+                 role="tabpanel"
+                 id="calibration-tab"
+                 aria-labelledby="calibration-control"
+                 hidden="">
+                 <div>
+                    <h1>Calibration Panel</h1>
+                    <form class="control-form">
+                        <label for="s33">Calibration Preset</label>
+                        <select id="s33" tabindex="0">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                        <br/>
+                        <label for="s31">Start Frequency in Megahertz</label>
+                        <input tabindex="0" type="text" id="s31" name="start_frequency_mhz" value="7"/>
+                        <br/>
+                        <label for="s32">End Frequency in Megahertz</label>
+                        <input tabindex="0" type="text" id="s32" name="end_frequency_mhz" value="7.3"/>
+                        <br/>
+                        <button tabindex="0" class="calibration-button">Attach Short and Press When Ready</button>
+                        <br/>
+                        <button tabindex="0" class="calibration-button">Attach Open and Press When Ready</button>
+                        <br/>
+                        <button tabindex="0" class="calibration-button">Attach Load and Press When Ready</button>
+                    </form>
+                </div>
+            </div>
+            <div tabindex="0"
+                 role="tabpanel"
+                 id="administration-tab"
+                 aria-labelledby="administration-control"
+                 hidden="">
+                 <h1>Administration Panel</h1>
+                 <label for="s41">Serial Port</label>
+                 <input type="text" id="s41" name="serial_port" value="com3"/>
+            </div>
+            <div tabindex="0"
+                 role="tabpanel"
+                 id="about-tab"
+                 aria-labelledby="about-control"
+                 hidden="">
+                 <p>The NanoVNA control panel was designed by N1FMV and KC1FSZ.</p>
+                 <p>Details on the NanoVNA can be found <a href="https://nanovna.com/">here</a>.</p>
+                 <p>Details on the NanoVNA command language can be found <a href="https://4ham.ru/wp-content/uploads/2020/05/NanoVNA_Console_Commands_Dec-9-19-1.pdf">here</a>.</p>
+            </div>
+        </div>          
+    </body>
+</html>

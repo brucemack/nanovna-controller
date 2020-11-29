@@ -1,5 +1,5 @@
 import serial
-
+import logging
 
 def read_response_as_lines(ser):
     """
@@ -20,7 +20,7 @@ def run_command(ser, command):
     :param command: The command to send
     :return: An array of strings, one for each line returned by the command
     """
-    print("Running command: " + command)
+    logging.info("NanoVNA command: " + command)
     ser.write((command + "\r").encode("utf-8"))
     lines = read_response_as_lines(ser)
     # We discard the first line because that is the echo of the command

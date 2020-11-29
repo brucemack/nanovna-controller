@@ -3,60 +3,11 @@ import numpy as np
 import pandas as pd
 import serial
 import nanovna as nv
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, send_from_directory, send_file, jsonify
 import json
+import logging
 
-# This is the template that renders the main sweep screen
-template_sweep_text = """
-<html>
-    <head>
-        <title>NanoVNA Control Panel</title>
-        <style>
-        table {
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        </style>
-    </head>
-    <body>
-        <h1>NanoVNA Control Panel</h1>
-        <p>The NanoVNA is connected</p>
-        <form method="post" action="/">
-            <label for="s1">Start Frequency in Megahertz</label>
-            <input type="text" id="s1" name="start_frequency_mhz" value="{{ start_frequency_mhz }}"/>
-            <label for="s2">End Frequency in Megahertz</label>
-            <input type="text" id="s2" name="end_frequency_mhz" value="{{ end_frequency_mhz}}"/>
-            <label for="s3">Step in Megahertz</label>
-            <input type="text" id="s3" name="step_frequency_mhz" value="{{ step_frequency_mhz}}"/>
-            <button>Sweep</button>
-        </form>
-        <table>
-            <caption>VSWR Sweep Results</caption>
-            <thead>
-                <tr>
-                    {% for freq in freqs %}
-                    <th>{{ freq }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for vswr in vswrs %}
-                    <td> {{ vswr }}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-        <p>NanoVNA voltage is {{ voltage }} volts</p>
-    </body>
-</html>
-"""
-
-template_sweep = Template(template_sweep_text)
 ser = None
-
 
 def connect_if_necessary():
     global ser
@@ -64,6 +15,7 @@ def connect_if_necessary():
         print("Connection is not open")
         # Open the serial port to the NanoVNA
         ser = serial.Serial('/dev/cu.usbmodem4001')
+        print("Connected")
     else:
         print("Connection is good")
 
@@ -74,47 +26,86 @@ state = {
     "step_frequency_mhz": 0.25
 }
 
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+
 listen_host = "localhost"
 listen_port = 8080
 
 app = Flask(__name__)
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/static/<filename>")
+def root2(filename):
+    return send_file("static/" + filename)
+
+
+@app.route("/")
+def root():
+    return send_file("static/index.html")
+
+"""
+    result = {
+        "errors": False,
+        "message": "Argument error",
+        "headers": [ "1", "2", "3"],
+        "rows": [
+            {
+                "cells": [ "a", "b", "c" ]
+            },
+            {
+                "cells": [ "d", "e", "f" ]
+            }
+        ]
+    }
+"""
+
+@app.route("/api/sweep", methods=["GET", "POST"])
 def sweep():
 
-    global state
+    connect_if_necessary()
 
     try:
-        # Look for post variables
-        if request.method == "POST":
-            state["start_frequency_mhz"] = request.form["start_frequency_mhz"]
-            state["end_frequency_mhz"] = request.form["end_frequency_mhz"]
-            state["step_frequency_mhz"] = request.form["step_frequency_mhz"]
-        elif request.method == "GET":
-            if "sweep_state" in request.cookies:
-                print("Cookie received")
-                state = json.loads(request.cookies.get("sweep_state"))
-
-        print(state)
-        connect_if_necessary()
-
-        # Test
-        start_frequency = int(float(state["start_frequency_mhz"]) * 1000000)
-        end_frequency = int(float(state["end_frequency_mhz"]) * 1000000)
-        step_frequency = int(float(state["step_frequency_mhz"]) * 1000000)
-        step_count = int((end_frequency - start_frequency) / step_frequency)
-
-        if start_frequency >= end_frequency or step_count > 50:
-            print("Range error")
-            raise Exception("Frequency range error")
+        # Process request parameters
+        if request.args.get("cal_preset").strip() == "":
+            raise Exception("Calibration preset is missing")
+        cal_preset = int(request.args.get("cal_preset"))
+        if request.args.get("start_frequency_mhz").strip() == "":
+            raise Exception("Start frequency is missing")
+        try:
+            start_frequency = int(float(request.args.get("start_frequency_mhz")) * 1000000)
+        except Exception as ex:
+            raise Exception("Invalid start frequency: " + str(ex))
+        if request.args.get("end_frequency_mhz").strip() == "":
+            raise Exception("End frequency is missing")
+        try:
+            end_frequency = int(float(request.args.get("end_frequency_mhz")) * 1000000)
+        except Exception as ex:
+            raise Exception("Invalid end frequency: " + str(ex))
+        if start_frequency >= end_frequency:
+            raise Exception("Frequency range was not valid")
+        if request.args.get("step_frequency_mhz").strip() == "":
+            step_count = 10
+            step_frequency = (end_frequency - start_frequency) / step_count
+        else:
+            try:
+                step_frequency = int(float(request.args.get("step_frequency_mhz")) * 1000000)
+                if step_frequency < 0:
+                    raise Exception("Step must be positive")
+            except Exception as ex:
+                raise Exception("Invalid step: " + str(ex))
+            step_count = int((end_frequency - start_frequency) / step_frequency)
+        if step_count > 50:
+            raise Exception("There are too many steps")
+        if step_count == 0:
+            raise Exception("There are not enough steps")
 
         nv.run_command(ser, "info")
+        nv.run_command(ser, "recall " + str(cal_preset))
         # Set the sweep range
         nv.run_command(ser, "sweep " + str(start_frequency) + " " + str(end_frequency))
         # Get the battery voltage in volts
-        vbat_lines = nv.run_command(ser, "vbat")
-        vbat = float(vbat_lines[0][:-2]) / 1000
+        #vbat_lines = nv.run_command(ser, "vbat")
+        #vbat = float(vbat_lines[0][:-2]) / 1000
         # Collect the frequencies of the sweep
         lines = nv.run_command(ser, "frequencies")
         frequency_list = [float(line) for line in lines]
@@ -136,32 +127,30 @@ def sweep():
         min_vswr = min(result_vswrs)
         # Determine which index the minimum belongs to
         min_index = result_vswrs.index(min_vswr)
-        # Format
-        formatted_frequencies = ["{:.03f}".format(f / 1000000.0) for f in result_frequencies]
-        formatted_vswrs = ["{:.02f}".format(v) for v in result_vswrs]
-        # Tweak the minimum VSWR with the best match annotation
-        formatted_frequencies[min_index] = formatted_frequencies[min_index] + " best match"
-        formatted_vswrs[min_index] = formatted_vswrs[min_index] + " best match"
-        formatted_voltage = "{:.01f}".format(vbat)
 
-        a = {
-            'freqs': formatted_frequencies,
-            'vswrs': formatted_vswrs,
-            'start_frequency_mhz': state["start_frequency_mhz"],
-            'end_frequency_mhz': state["end_frequency_mhz"],
-            'step_frequency_mhz': state["step_frequency_mhz"],
-            'voltage': formatted_voltage
+        # Format the result
+        result = {
+            "error": False,
+            "headers": ["{:.03f}".format(f / 1000000.0) for f in result_frequencies],
+            "rows": [
+                {
+                    "cells": ["{:.02f}".format(v) for v in result_vswrs]
+                }
+            ]
         }
+        # Tweak the minimum VSWR with the best match annotation
+        result.get("headers")[min_index] = result.get("headers")[min_index] + " best match"
+        result.get("rows")[0].get("cells")[min_index] = result.get("rows")[0].get("cells")[min_index] + " best match"
 
-        response = make_response(template_sweep.render(a))
-        # Store the state for future usage
-        response.set_cookie("sweep_state", json.dumps(state))
-
-        return response
+        return jsonify(result)
 
     except Exception as ex:
-        print("Error", ex)
-        return "Error"
+        logging.error("Error in sweep", ex)
+        result = {
+            "error": True,
+            "message": ex.args[0]
+        }
+        return jsonify(result)
 
 
 if __name__ == "__main__":
