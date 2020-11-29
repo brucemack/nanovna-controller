@@ -9,30 +9,21 @@ import logging
 
 ser = None
 
-def connect_if_necessary():
-    global ser
-    if ser is None:
-        print("Connection is not open")
-        # Open the serial port to the NanoVNA
-        ser = serial.Serial('/dev/cu.usbmodem4001')
-        print("Connected")
-    else:
-        print("Connection is good")
-
-
-state = {
-    "start_frequency_mhz": 28,
-    "end_frequency_mhz": 30,
-    "step_frequency_mhz": 0.25
+config = {
+    "listen_host": "localhost",
+    "listen_port": 8080
 }
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+user_config = {
+    "port": "/dev/cu.usbmodem4001",
+}
 
-listen_host = "localhost"
-listen_port = 8080
 
+
+
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 app = Flask(__name__)
-
+nanovna = nv.Nanovna()
 
 @app.route("/static/<filename>")
 def root2(filename):
@@ -43,28 +34,12 @@ def root2(filename):
 def root():
     return send_file("static/index.html")
 
-"""
-    result = {
-        "errors": False,
-        "message": "Argument error",
-        "headers": [ "1", "2", "3"],
-        "rows": [
-            {
-                "cells": [ "a", "b", "c" ]
-            },
-            {
-                "cells": [ "d", "e", "f" ]
-            }
-        ]
-    }
-"""
-
 @app.route("/api/sweep", methods=["GET", "POST"])
 def sweep():
-
-    connect_if_necessary()
-
     try:
+        # Get connected to the NanoVNA
+        nanovna.connect_if_necessary(user_config["port"])
+
         # Process request parameters
         if request.args.get("cal_preset").strip() == "":
             raise Exception("Calibration preset is missing")
@@ -99,20 +74,20 @@ def sweep():
         if step_count == 0:
             raise Exception("There are not enough steps")
 
-        nv.run_command(ser, "info")
-        nv.run_command(ser, "recall " + str(cal_preset))
+        nanovna.run_command("info")
+        nanovna.run_command("recall " + str(cal_preset))
         # Set the sweep range
-        nv.run_command(ser, "sweep " + str(start_frequency) + " " + str(end_frequency))
+        nanovna.run_command("sweep " + str(start_frequency) + " " + str(end_frequency))
         # Get the battery voltage in volts
         #vbat_lines = nv.run_command(ser, "vbat")
         #vbat = float(vbat_lines[0][:-2]) / 1000
         # Collect the frequencies of the sweep
-        lines = nv.run_command(ser, "frequencies")
+        lines = nanovna.run_command("frequencies")
         frequency_list = [float(line) for line in lines]
         # Make the VSWR data
-        rc_list = nv.get_complex_data(ser)
+        rc_list = nanovna.get_complex_data()
         # Convert to VSWR
-        vswr_list = [nv.reflection_coefficient_to_vswr(rc) for rc in rc_list]
+        vswr_list = [nanovna.reflection_coefficient_to_vswr(rc) for rc in rc_list]
         # Load the VSWR data into a DataFrame indexed by the frequency
         df = pd.DataFrame(vswr_list, index=frequency_list)
         # Re-sample using the start/end/step provided by the user.  Linear
@@ -145,7 +120,7 @@ def sweep():
         return jsonify(result)
 
     except Exception as ex:
-        logging.error("Error in sweep", ex)
+        logging.error("Error in sweep", exc_info=True)
         result = {
             "error": True,
             "message": ex.args[0]
@@ -154,5 +129,5 @@ def sweep():
 
 
 if __name__ == "__main__":
-    app.run(host=listen_host, port=listen_port)
+    app.run(host=config["listen_host"], port=config["listen_port"])
 
