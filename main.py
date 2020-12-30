@@ -10,20 +10,33 @@ import json
 import logging
 import configparser
 import sys
+import os
 
-if len(sys.argv) < 2:
-    logging.error("Argument error")
-    sys.exit(-1)
+VERSION = "2"
+base_dir_2 = os.path.dirname(os.path.realpath(__file__))
 
-# Get static location
-base_dir = sys.argv[1]
+if len(sys.argv) >= 2:
+    # Get static location
+    base_dir = sys.argv[1]
+else:
+    base_dir = base_dir_2
 
 # Configure logging
 logging.basicConfig(filename=base_dir + "/log.txt", format='%(asctime)s %(message)s', level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 logging.info("NanoVNA Controller")
-logging.info("Base Directory is " + base_dir)
+logging.info("Version " + VERSION)
+logging.info("Running from " + base_dir_2)
+logging.info("Base Directory " + base_dir)
+
+# Make sure the config file and static directories exist
+if not os.path.exists(base_dir + "/config.ini"):
+    logging.error("config.ini is not found")
+    quit()
+if not os.path.exists(base_dir + "/static"):
+    logging.error("static directory is not found")
+    quit()
 
 # Load .ini file
 config = configparser.ConfigParser()
@@ -49,7 +62,7 @@ def load_user_config():
 
     # Program some defaults
     if not ("port" in user_config):
-        user_config["port"] = "COM3"
+        user_config["port"] = "COM6"
 
 
 def save_user_config():
