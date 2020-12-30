@@ -50,7 +50,9 @@ Building Requirements
 PyInstaller Packaging
 =====================
 pip install PyInstaller
-pyinstaller --onefile main.py
+pyinstaller --onefile main.py --name nanovna-controller
+The .exe will end up in /dist
+Zip the .exe, config.ini, and the static folder together.
 
 Links
 =====
@@ -61,9 +63,11 @@ Precise Installation Instructions
 =================================
 * Download nanovna-controller.zip
 * Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
-* Edit the config.ini and set the workdir to a location where you'd like to store working files created by the controller.  
-* Open a command prompt and run the nanovna-controller.exe file with one command-line argument: the location of the base folder created in the second step above.  This is needed to allow the controller to locate the .ini file and static folder.
-* Point your browser to http://localhost:8080.  Or use whatever port number you have configured.
+* Edit the config.ini file:
+** Set the workdir to a location where you'd like to store working files created by the controller.    
+** Set the port you want to listen on for HTTP connections.
+* Open a command prompt and run the nanovna-controller.exe 
+* Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file
 
 Change Notes
 ============
