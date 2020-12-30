@@ -64,8 +64,8 @@ Precise Installation Instructions
 * Download nanovna-controller.zip
 * Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
 * Edit the config.ini file:
-** Set the workdir to a location where you'd like to store working files created by the controller.    
-** Set the port you want to listen on for HTTP connections.
+  - Set the workdir to a location where you'd like to store working files created by the controller.    
+  - Set the port you want to listen on for HTTP connections.
 * Open a command prompt and run the nanovna-controller.exe 
 * Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file
 
