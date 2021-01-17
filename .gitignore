@@ -1,8 +1,9 @@
 .idea/
 __pycache__/
-venv/
 log.txt
 .DS_Store
 build/
 dist/
+dev/
+
 
