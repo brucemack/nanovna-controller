@@ -1,11 +1,11 @@
 """
 NanoVNA Controller
-Designed by N1FMV and KC1FZ
+Designed by N1FMV and KC1FSZ
 """
 import numpy as np
 import pandas as pd
 import nanovna as nv
-from flask import Flask, request, make_response, send_from_directory, send_file, jsonify
+from flask import Flask, request, make_response, send_from_directory, send_file, jsonify, cli
 import json
 import logging
 import configparser
@@ -34,15 +34,13 @@ logging.info("Working directory is " + static_config["workdir"])
 logging.info("Listen port is " + static_config["listenport"])
 
 user_config = { }
-
+calibration_config = { }
 
 def load_user_config():
     global user_config
     try:
         with open(static_config["workdir"] + "/userconfig.json") as f:
             user_config = json.load(f)
-            logging.info("Loaded user configuration")
-            logging.info(user_config)
     except Exception as ex:
         logging.warning("Unable to read user configuration")
         user_config = {}
@@ -62,11 +60,13 @@ def save_user_config():
 # Initial load of configuration properties
 load_user_config()
 
+logging.info("USB port is " + user_config["port"])
+
 nanovna = nv.Nanovna()
 
 # Flask routes
+cli.show_server_banner = lambda *_: None
 app = Flask(__name__)
-
 
 @app.route("/static/<filename>")
 def root2(filename):
@@ -97,46 +97,42 @@ def calibrate():
         # Get connected to the NanoVNA
         nanovna.connect_if_necessary(user_config["port"])
 
-        # Process request parameters
-        if request.args.get("cal_preset").strip() == "":
-            raise Exception("Calibration preset is missing")
-        cal_preset = int(request.args.get("cal_preset"))
-        if request.args.get("start_frequency_mhz").strip() == "":
-            raise Exception("Start frequency is missing")
-        try:
-            start_frequency = int(float(request.args.get("start_frequency_mhz")) * 1000000)
-        except Exception as ex:
-            raise Exception("Invalid start frequency: " + str(ex))
-        if request.args.get("end_frequency_mhz").strip() == "":
-            raise Exception("End frequency is missing")
-        try:
-            end_frequency = int(float(request.args.get("end_frequency_mhz")) * 1000000)
-        except Exception as ex:
-            raise Exception("Invalid end frequency: " + str(ex))
-        if start_frequency >= end_frequency:
-            raise Exception("Frequency range was not valid")
+        logging.info(request.args)
 
-        # On step 0 we set the range and reset
         if request.args["step"] == "0":
-            logging.info("Calibration step 0")
+            nanovna.run_command("cal reset")
+        elif request.args["step"] == "1":
+            if request.args.get("cal_preset").strip() == "":
+                raise Exception("Calibration preset is missing")
+            calibration_config["cal_preset"] = int(request.args.get("cal_preset"))
+        elif request.args["step"] == "2":
+            if request.args.get("start_frequency_mhz").strip() == "":
+                raise Exception("Start frequency is missing")
+            try:
+                start_frequency = int(float(request.args.get("start_frequency_mhz")) * 1000000)
+            except Exception as ex:
+                raise Exception("Invalid start frequency: " + str(ex))
+            if request.args.get("end_frequency_mhz").strip() == "":
+                raise Exception("End frequency is missing")
+            try:
+                end_frequency = int(float(request.args.get("end_frequency_mhz")) * 1000000)
+            except Exception as ex:
+                raise Exception("Invalid end frequency: " + str(ex))
+            if start_frequency >= end_frequency:
+                raise Exception("Frequency range was not valid")
+
             # Set the sweep range
             nanovna.run_command("sweep " + str(start_frequency) + " " + str(end_frequency))
-            # Reset
-            nanovna.run_command("cal reset")
             # Cal short
+        elif request.args["step"] == "3":
             nanovna.run_command("cal short")
-        elif request.args["step"] == "1":
-            logging.info("Calibration step 1")
-            # Cal open
+        elif request.args["step"] == "4":
             nanovna.run_command("cal open")
-        elif request.args["step"] == "2":
-            logging.info("Calibration step 2")
-            # Cal load
+        elif request.args["step"] == "5":
             nanovna.run_command("cal load")
-            # Cal done
             nanovna.run_command("cal done")
-            # Save
-            nanovna.run_command("save " + request.args["cal_preset"])
+            # Save the designated present
+            nanovna.run_command("save " + str(calibration_config["cal_preset"]))
 
         return "OK"
 

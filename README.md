@@ -1,14 +1,10 @@
 Overview
 ========
-This is a simple control panel for the NanoVNA.  An HTML interface is provided.
+This is a simple control interface for the NanoVNA.  An HTML interface is provided 
+that allows the user to perform VSWR sweeps of antennas or other devices.  
+Calibration is also possible using the interface.
 
 This program was designed by N1FMV and KC1FSZ.
-
-Runnning Instructions
-=====================
-There are two parameters:
-* The serial (comm) port to use when communicating with the NanoVNA.
-* The TCP port to listen on for HTTP requests.  Defaults to 8080.
 
 NanoVNA Technial Information
 ============================

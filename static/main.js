@@ -75,6 +75,17 @@ function setupTabNavigation(tabs) {
     });
 }
 
+// This function is used for implementing a multi-step workflow.  Each step
+// has its own <div> that is shown in sequence.
+function showStepDiv(divSet, step) {
+    // Hide all steps
+    $(divSet).find(".step-div").hide()
+    // Show the step that was selected
+    $(divSet).find(".step-div").eq(step).show()
+    // Focus the right control for this step
+    $(divSet).find(".step-div").eq(step).find(".step-focus").focus()
+}
+
 function do_sweep(panel) {
 
     // Get the form inputs
@@ -117,20 +128,76 @@ function do_complex_sweep(panel) {
         });
 }
 
-function do_calibration(panel, step) {
+/*
+This function is used to validate the start/end frequency range that is
+entered into the calibration form.  This makes sure that both values
+have been entered and that the start is less than then end.
 
-    // Get the form inputs
-    var params = {
-        cal_preset: $(panel).find(".s4").val(),
-        start_frequency_mhz: $(panel).find(".s1").val(),
-        end_frequency_mhz: $(panel).find(".s2").val(),
-        step: step
+If a validation problem is detected then the workflow button is
+marked to prevent progress to the next step.
+*/
+function validateCalibrationRange(panel) {
+
+    startValue = $(panel).find(".s1").val().trim()
+    endValue = $(panel).find(".s2").val().trim()
+
+    try {
+        if (startValue == "" || endValue == "") {
+            throw "missing value"
+        }
+        var start = parseFloat(startValue)
+        var end = parseFloat(endValue)
+        if (isNaN(start) || isNaN(end) || end < start) {
+            throw "range error"
+        }
+        // If we get to this point then the values are correct and we can
+        // allow the workflow to proceed
+        $(panel).find("#s30").text("Continue")
+        $(panel).find("#s30").data("block-workflow", false)
+    }
+    catch (ex) {
+        $(panel).find("#s30").text("Invalid Range")
+        $(panel).find("#s30").data("block-workflow", true)
+    }
+}
+
+function doCalStep(panel, step) {
+
+    var params;
+
+    // STEP 0: Does nothing
+    // STEP 3: Short
+    // STEP 4: Open
+    // STEP 5: Load
+    // STEP 6: Repeat
+    if (step == 0 || step == 3 || step == 4 || step == 5 || step == 6) {
+        params = {
+            step: step
+        }
+    }
+    // STEP 1: Establishes preset
+    else if (step == 1) {
+        params = {
+            step: step,
+            cal_preset: $(panel).find(".s4").val()
+        }
+    }
+    // STEP 2: Establishes range
+    else if (step == 2) {
+        // Make sure the validation passed
+        if ($(panel).find("#s30").data("block-workflow") == true) {
+            return
+        }
+        params = {
+            step: step,
+            start_frequency_mhz: $(panel).find(".s1").val(),
+            end_frequency_mhz: $(panel).find(".s2").val()
+        }
     }
 
-    // Load up the sweep table user server-side data
     $.get("/api/calibrate", params)
         .done(function(data) {
-            console.info("Step done")
+            //console.info("Step done " + step)
         });
 }
 

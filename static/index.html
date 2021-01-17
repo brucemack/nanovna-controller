@@ -76,6 +76,9 @@ $.ajaxSetup({ cache: false });
 var template_0;
 var template_1;
 var template_2;
+// The calibration workflow is a multi-step process.  This variable
+// keeps track of which step we are on.
+var calWorkflowStep = 0;
 
 $(document).ready(function() {
 
@@ -107,15 +110,36 @@ $(document).ready(function() {
         $.post("/api/config",{ "port": v })
     });
 
+    // This is logic needed to make sure that the range of frequencies
+    // entered on the calibration tab is valid
+    $("#calibration-tab #s31").change(function(event) {
+        validateCalibrationRange($("#calibration-tab"))
+    });
+    $("#calibration-tab #s32").change(function(event) {
+        validateCalibrationRange($("#calibration-tab"))
+    });
+    // Trigger an initial validation (which will fail since the
+    // initial value of the fields is empty)
+    validateCalibrationRange($("#calibration-tab"))
+
     // Action buttons on calibration
+    showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep);
+
+    // Attach workflow function to calibration buttons
     $("#calibration-tab .button-0").click(function(event) {
-        do_calibration($("#calibration-tab"), 0)
-    });
-    $("#calibration-tab .button-1").click(function(event) {
-        do_calibration($("#calibration-tab"), 1)
-    });
-    $("#calibration-tab .button-2").click(function(event) {
-        do_calibration($("#calibration-tab"), 2)
+        // Check to see if the workflow is blocked at this point
+        if ($(this).data("block-workflow")) {
+            return;
+        }
+        // Do the step
+        doCalStep($("#calibration-tab"), calWorkflowStep)
+        // Advance
+        calWorkflowStep++
+        // Wrap?
+        if (calWorkflowStep == 7) {
+            calWorkflowStep = 0
+        }
+        showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep);
     });
 
     // Fill in the initial config values
@@ -238,26 +262,45 @@ $(document).ready(function() {
                  <div>
                     <h1>Calibration Panel</h1>
                     <form class="control-form">
-                        <label for="s33">Calibration Preset</label>
-                        <select class="s4" id="s33" tabindex="0" name="cal_preset">
-                            <option>0</option>
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                        </select>
-                        <br/>
-                        <label for="s31">Start Frequency in Megahertz</label>
-                        <input class="s1" tabindex="0" type="text" id="s31" name="start_frequency_mhz"/>
-                        <br/>
-                        <label for="s32">End Frequency in Megahertz</label>
-                        <input class="s2" tabindex="0" type="text" id="s32" name="end_frequency_mhz"/>
-                        <br/>
-                        <button tabindex="0" class="button-0">Attach Short and Press When Ready</button>
-                        <br/>
-                        <button tabindex="0" class="button-1">Attach Open and Press When Ready</button>
-                        <br/>
-                        <button tabindex="0" class="button-2">Attach Load and Press When Ready</button>
+                        <div class="step-div-set">
+                            <div class="step-div">
+                                <button tabindex="0" class="button-0 step-focus">Begin Calibration</button>
+                            </div>
+                            <div class="step-div">
+                                <label for="s33">Select Calibration Preset</label>
+                                <select class="s4 step-focus" id="s33" tabindex="0" name="cal_preset">
+                                    <option>0</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                </select>
+                                <br/>
+                                <button tabindex="0" class="button-0">Continue</button>
+                            </div>
+                            <div class="step-div">
+                                <label for="s31">Start Frequency in Megahertz</label>
+                                <input class="s1 step-focus" tabindex="0" type="text" id="s31" name="start_frequency_mhz"/>
+                                <br/>
+                                <label for="s32">End Frequency in Megahertz</label>
+                                <input class="s2" tabindex="0" type="text" id="s32" name="end_frequency_mhz"/>
+                                <br/>
+                                <button tabindex="0" class="button-0 s3" id="s30">Continue</button>
+                            </div>
+                            <div class="step-div">
+                                <button tabindex="0" class="button-0 step-focus">Attach Short and Press When Ready</button>
+                            </div>
+                            <div class="step-div">
+                                <button tabindex="0" class="button-0 step-focus">Attach Open and Press When Ready</button>
+                            </div>
+                            <div class="step-div">
+                                <button tabindex="0" class="button-0 step-focus">Attach Load and Press When Ready</button>
+                            </div>
+                            <div class="step-div">
+                                <p>Calibration is complete.</p>
+                                <button tabindex="0" class="button-0 step-focus">Restart</button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
