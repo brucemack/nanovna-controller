@@ -12,7 +12,7 @@ import configparser
 import sys
 import os
 
-VERSION = "2"
+VERSION = "3"
 base_dir_2 = os.path.dirname(os.path.realpath(__file__))
 
 if len(sys.argv) >= 2:
@@ -49,6 +49,7 @@ logging.info("Listen port is " + static_config["listenport"])
 user_config = { }
 calibration_config = { }
 
+
 def load_user_config():
     global user_config
     try:
@@ -83,6 +84,7 @@ for p in nanovna.list_serial_ports():
 # Flask routes
 cli.show_server_banner = lambda *_: None
 app = Flask(__name__)
+
 
 @app.route("/static/<filename>")
 def root2(filename):
