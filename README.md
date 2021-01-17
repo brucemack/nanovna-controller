@@ -6,7 +6,7 @@ Calibration is also possible using the interface.
 
 This program was designed by N1FMV and KC1FSZ.
 
-NanoVNA Technial Information
+NanoVNA Technical Information
 ============================
 The data command causes the NanoVNA to return a list of reflection coefficients in real/imaginary pairs.  Each line contains one coefficient and the real/imaginary parts are space-delimited.
 
@@ -22,7 +22,6 @@ python -m venv dev
 dev\Scripts\activate.bat
 python -m pip install --upgrade pip
 pip install pyserial
-pip install pandas
 pip install Flask
 pip install PyInstaller
 
@@ -39,7 +38,6 @@ Windows, command-line, development:
 Building Requirements
 =====================
 * pyserial - For serial communications to the NanoVNA
-* pandas - Needed for data interpolation
 * Flask - Needed for web serving
 
 PyInstaller Packaging
@@ -67,11 +65,11 @@ Precise Installation Instructions
 Change Notes
 ============
 Version 3:
-* Major rework of calibration process
-* Cleaned up some of the noise on the console window at startup
-* Automatically stripping spaces from serial port entry
-
-
+* Major rework of calibration process.
+* Cleaned up some of the noise on the console window at startup.
+* Automatically stripping spaces from serial port entry.
+* If a single number is entered into the serial port box, automatically at the "com" prefix.
+* Fixed problem with complex impedance.  Now showing real and imaginary components.
 
 Version 2:
 * Defaults to COM6

@@ -73,9 +73,12 @@ def save_user_config():
 # Initial load of configuration properties
 load_user_config()
 
-logging.info("USB port is " + user_config["port"])
+logging.info("Configured USB port is " + user_config["port"])
 
 nanovna = nv.Nanovna()
+
+for p in nanovna.list_serial_ports():
+    logging.info("Found USB port " + p)
 
 # Flask routes
 cli.show_server_banner = lambda *_: None
@@ -109,8 +112,6 @@ def calibrate():
     try:
         # Get connected to the NanoVNA
         nanovna.connect_if_necessary(user_config["port"])
-
-        logging.info(request.args)
 
         if request.args["step"] == "0":
             nanovna.run_command("cal reset")
