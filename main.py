@@ -3,8 +3,8 @@ NanoVNA Controller
 Designed by N1FMV and KC1FSZ
 """
 import numpy as np
-import pandas as pd
 import nanovna as nv
+from calcs import *
 from flask import Flask, request, make_response, send_from_directory, send_file, jsonify, cli
 import json
 import logging
@@ -238,21 +238,26 @@ def sweep():
         rc_list = nanovna.get_complex_data()
         # Convert to VSWR
         vswr_list = [nanovna.reflection_coefficient_to_vswr(rc) for rc in rc_list]
-        # Load the VSWR data into a DataFrame indexed by the frequency
-        df = pd.DataFrame(vswr_list, index=frequency_list)
+        z_list = [nanovna.reflection_coefficient_to_z(rc) for rc in rc_list]
         # Re-sample using the start/end/step provided by the user.  Linear
         # interpolation is automatically used
         frequency_space = np.linspace(start_frequency, end_frequency - step_frequency, step_count)
-        df1 = df.reindex(frequency_space).interpolate()
-        # Pull out index values
-        result_frequencies = df1.index.tolist()
-        # Pull out VSWR values
-        result_vswrs = [column[0] for column in df1.values.tolist()]
+        result_frequencies = []
+        result_vswrs = []
+        result_real = []
+        result_imaginary = []
+        for frequency in frequency_space:
+            result_frequencies.append(frequency)
+            vswr = interp(frequency_list, vswr_list, frequency)
+            result_vswrs.append(vswr)
+            z = interp(frequency_list, z_list, frequency)
+            result_real.append(z.real)
+            result_imaginary.append(z.imag)
         # Find the lowest value
         min_vswr = min(result_vswrs)
-        # Determine which index the minimum belongs to
-        min_index = result_vswrs.index(min_vswr)
-
+        for i in range(len(result_frequencies)):
+            if result_vswrs[i] == min_vswr:
+                min_index = i
         # Format the result
         result = {
             "error": False,
@@ -261,6 +266,14 @@ def sweep():
                 {
                     "header": "VSWR",
                     "cells": ["{:.02f}".format(v) for v in result_vswrs]
+                },
+                {
+                    "header": "Real(Z)",
+                    "cells": ["{:.02f}".format(v) for v in result_real]
+                },
+                {
+                    "header": "Imag(Z)",
+                    "cells": ["{:.02f}".format(v) for v in result_imaginary]
                 }
             ]
         }

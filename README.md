@@ -66,6 +66,13 @@ Precise Installation Instructions
 
 Change Notes
 ============
+Version 3:
+* Major rework of calibration process
+* Cleaned up some of the noise on the console window at startup
+* Automatically stripping spaces from serial port entry
+
+
+
 Version 2:
 * Defaults to COM6
 * Able to auto-sense the base dir

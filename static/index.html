@@ -19,7 +19,7 @@ Designed by N1FVMV and KC1FSZ
                 </caption>
                 <thead>
                     {{#each headers}}
-                    <th>
+                    <th class="number-cell">
                         {{this}}
                     </th>
                     {{/each}}
@@ -28,7 +28,7 @@ Designed by N1FVMV and KC1FSZ
                     {{#each rows}}
                     <tr>
                         {{#each this.cells}}
-                        <td>
+                        <td class="number-cell">
                             {{this}}
                         </td>
                         {{/each}}
@@ -45,7 +45,7 @@ Designed by N1FVMV and KC1FSZ
                 <thead>
                     <td></td>
                     {{#each headers}}
-                    <th>
+                    <th class="number-cell">
                         {{this}}
                     </th>
                     {{/each}}
@@ -55,7 +55,7 @@ Designed by N1FVMV and KC1FSZ
                     <tr>
                         <th>{{this.header}}</th>
                         {{#each this.cells}}
-                        <td>
+                        <td class="number-cell">
                             {{this}}
                         </td>
                         {{/each}}
@@ -107,6 +107,14 @@ $(document).ready(function() {
     // Input on administration tab
     $("#administration-tab .port-input").blur(function(event) {
         var v = $(this).val()
+        // Remove spaces
+        v = v.replace(/\s/g, '');
+        // If a single number is entered, add leading "com"
+        if (!isNaN(v)) {
+          v = "COM" + v
+        }
+        // Replace the modified value
+        $(this).val(v)
         $.post("/api/config",{ "port": v })
     });
 

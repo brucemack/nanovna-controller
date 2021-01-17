@@ -45,6 +45,8 @@ class Nanovna:
         except Exception as ex:
             self.ser = None
             raise ex
+        if len(data) == 0:
+            raise Exception("No data received from NanoVNA")
         # Pull off the last part (not relevant data)
         data = data[:-4]
         # Break into lines and then decode into strings.
@@ -83,3 +85,11 @@ class Nanovna:
         """
         gamma = abs(rc)
         return (1.0 + gamma) / (1.0 - gamma)
+
+
+    @staticmethod
+    def reflection_coefficient_to_z(rc):
+        """
+        Z = Zo * ((1 + Γ) / (1 - Γ))
+        """
+        return 50.0 * (1.0 + rc) / (1 - rc)
