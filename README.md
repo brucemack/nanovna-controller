@@ -1,8 +1,7 @@
 Overview
 ========
 This is a simple control interface for the NanoVNA.  An HTML interface is provided 
-that allows the user to perform VSWR sweeps of antennas or other devices.  
-Calibration is also possible using the interface.
+that allows the user to perform VSWR sweeps of antennas or other devices.  Calibration is also possible using the interface.
 
 This program was designed by N1FMV and KC1FSZ.
 
@@ -18,12 +17,12 @@ One Time Setup
 ==============
 On Windows:
 
-python -m venv dev
-dev\Scripts\activate.bat
-python -m pip install --upgrade pip
-pip install pyserial
-pip install Flask
-pip install PyInstaller
+* python -m venv dev
+* dev\Scripts\activate.bat
+* python -m pip install --upgrade pip
+* pip install pyserial
+* pip install Flask
+* pip install PyInstaller
 
 NOTE: This is needed to work around a bug in Windows 10 2004.  See https://developercommunity.visualstudio.com/content/problem/1207405/fmod-after-an-update-to-windows-2004-is-causing-a.html
 
@@ -42,8 +41,9 @@ Building Requirements
 
 PyInstaller Packaging
 =====================
-pip install PyInstaller
-pyinstaller --onefile main.py --name nanovna-controller
+* pip install PyInstaller
+* pyinstaller --onefile main.py --name nanovna-controller
+
 The .exe will end up in /dist
 Zip the .exe, config.ini, and the static folder together.
 
@@ -76,3 +76,6 @@ Version 2:
 * Able to auto-sense the base dir
 * Error checks for config.ini and static dir
 * Changing numpuy version to address Windows bug
+
+Version 1:
+* Initial version
