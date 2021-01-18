@@ -24,15 +24,20 @@ On Windows:
 * pip install Flask
 * pip install PyInstaller
 
-NOTE: This is needed to work around a bug in Windows 10 2004.  See https://developercommunity.visualstudio.com/content/problem/1207405/fmod-after-an-update-to-windows-2004-is-causing-a.html
+Resolvoing Numpy Problen on Windows 10 2004
+--------------------------------------------
+This is needed to work around a bug in Windows 10 2004.  See https://developercommunity.visualstudio.com/content/problem/1207405/fmod-after-an-update-to-windows-2004-is-causing-a.html
+
+Microsoft is supposed to have this problem fixed in the next update 
+of Windows 10.
 
 pip install numpy==1.19.3
 
-Running
-=======
+Running (Development Mode)
+==========================
 Windows, command-line, development:
 
-* python main.py .
+* python main.py
 
 Building Requirements
 =====================
@@ -41,11 +46,26 @@ Building Requirements
 
 PyInstaller Packaging
 =====================
+
 * pip install PyInstaller
 * pyinstaller --onefile main.py --name nanovna-controller
 
 The .exe will end up in /dist
 Zip the .exe, config.ini, and the static folder together.
+
+Resolving Issues with PyInstaller Virus Detection
+-------------------------------------------------
+Many anti-malware tools have a problem with the pre-built bootloader
+shipped in the standard PyInstaller distribution.  The work-around 
+is to pull the source distribution of PyInstaller and build the 
+bootloader locally.
+
+* git clone https://github.com/pyinstaller/pyinstaller.git
+* cd pyinstaller
+* cd bootloader
+* python ./waf all
+* Switch to the nanovna-controller virtual environment
+* pip install c:/Users/bruce/git/pyinstaller
 
 Links
 =====
@@ -64,18 +84,23 @@ Precise Installation Instructions
 
 Change Notes
 ============
-Version 3:
+
+Version 3
+---------
 * Major rework of calibration process.
 * Cleaned up some of the noise on the console window at startup.
 * Automatically stripping spaces from serial port entry.
 * If a single number is entered into the serial port box, automatically at the "com" prefix.
 * Fixed problem with complex impedance.  Now showing real and imaginary components.
+* Using locally compiled bootloader to avoid issues with Windows Threat Detection.
 
-Version 2:
+Version 2
+---------
 * Defaults to COM6
 * Able to auto-sense the base dir
 * Error checks for config.ini and static dir
 * Changing numpuy version to address Windows bug
 
-Version 1:
+Version 1
+---------
 * Initial version
