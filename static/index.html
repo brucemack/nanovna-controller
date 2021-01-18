@@ -225,13 +225,14 @@ $(document).ready(function() {
                          <option>4</option>
                      </select>
                      <label for="s11">Start Frequency in Megahertz</label>
-                     <input class="s1" type="text" id="s11" name="start_frequency_mhz"/>
+                     <input class="s1" type="text" id="s11" tabindex="0" name="start_frequency_mhz"/>
                      <label for="s12">End Frequency in Megahertz</label>
-                     <input class="s2" type="text" id="s12" name="end_frequency_mhz"/>
+                     <input class="s2" type="text" id="s12" tabindex="0" name="end_frequency_mhz"/>
                      <label for="s13">Step in Megahertz</label>
-                     <input class="s3" type="text" id="s13" name="step_frequency_mhz"/>
-                     <button class="go">Sweep</button>
+                     <input class="s3" type="text" id="s13" tabindex="0" name="step_frequency_mhz"/>
+                     <button id="s14" class="go" tabindex="0">Sweep</button>
                  </form>
+                 <br/>
                  <div class="result-div"></div>
             </div>
 
@@ -252,13 +253,14 @@ $(document).ready(function() {
                          <option>4</option>
                      </select>
                      <label for="s21">Start Frequency in Megahertz</label>
-                     <input class="s1" type="text" id="s21" name="start_frequency_mhz"/>
+                     <input class="s1" type="text" id="s21"  tabindex="0" name="start_frequency_mhz"/>
                      <label for="s22">End Frequency in Megahertz</label>
-                     <input class="s2" type="text" id="s22" name="end_frequency_mhz"/>
+                     <input class="s2" type="text" id="s22"  tabindex="0" name="end_frequency_mhz"/>
                      <label for="s23">Step in Megahertz</label>
-                     <input class="s3" type="text" id="s23" name="step_frequency_mhz"/>
-                     <button class="go">Sweep</button>
+                     <input class="s3" type="text" id="s23"  tabindex="0" name="step_frequency_mhz"/>
+                     <button class="go" tabindex="0" >Sweep</button>
                  </form>
+                 <br/>
                  <div class="result-div"></div>
             </div>
 
@@ -307,7 +309,7 @@ $(document).ready(function() {
                             </div>
                             <div class="step-div">
                                 <p>Calibration is complete.</p>
-                                <button tabindex="0" class="button-0 step-focus">Restart</button>
+                                <button tabindex="0" class="button-0 step-focus">Calibration Complete Press to Restart</button>
                             </div>
                         </div>
                     </form>
