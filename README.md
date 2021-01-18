@@ -89,10 +89,10 @@ Version 3
 ---------
 * Major rework of calibration process.
 * Cleaned up some of the noise on the console window at startup.
-* Automatically stripping spaces from serial port entry.
-* If a single number is entered into the serial port box, automatically at the "com" prefix.
+* Automatically stripping spaces from serial port entry on administration tab.
+* If a single number is entered into the serial port box, automatically add the "com" prefix.
 * Fixed problem with complex impedance.  Now showing real and imaginary components.
-* Using locally compiled bootloader to avoid issues with Windows Threat Detection.
+* Using locally-compiled PyInstaller bootloader to avoid issues with Windows Threat Detection.
 
 Version 2
 ---------
