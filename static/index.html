@@ -77,10 +77,12 @@ $.ajaxSetup({ cache: false });
 var template_0;
 var template_1;
 var template_2;
+
 // The calibration workflow is a multi-step process.  This variable
 // keeps track of which step we are on.
 var calWorkflowStep = 0;
 
+// Page load initialization
 $(document).ready(function() {
 
     // Compile the templates
@@ -132,23 +134,33 @@ $(document).ready(function() {
     validateCalibrationRange($("#calibration-tab"))
 
     // Action buttons on calibration
-    showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep);
+    showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep, prepareCalStepDiv);
 
     // Attach workflow function to calibration buttons
     $("#calibration-tab .button-0").click(function(event) {
-        // Check to see if the workflow is blocked at this point
+        // Check to see if the workflow is blocked at this point.  If so then just
+        // ignore the button press.
         if ($(this).data("block-workflow")) {
             return;
         }
-        // Do the step
-        doCalStep($("#calibration-tab"), calWorkflowStep)
-        // Advance
-        calWorkflowStep++
-        // Wrap?
-        if (calWorkflowStep == 7) {
-            calWorkflowStep = 0
-        }
-        showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep);
+        // Do the step.  If it fails then return to the first step.  If 
+        // it succeeds then move forward to the next step.
+        doCalStep($("#calibration-tab"), calWorkflowStep,
+            // Success 
+            () => {
+                // Advance to the next step
+                calWorkflowStep++
+                // Wrap?
+                if (calWorkflowStep == 7) {
+                    calWorkflowStep = 0
+                }
+                showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep, prepareCalStepDiv);
+            },
+            // Error
+            () => {
+                calWorkflowStep = 0;
+                showStepDiv($("#calibration-tab .step-div-set"), calWorkflowStep, prepareCalStepDiv);
+            })
     });
 
     // Fill in the initial config values
@@ -230,7 +242,7 @@ $(document).ready(function() {
                      <input class="s2" type="text" id="s12" tabindex="0" name="end_frequency_mhz"/>
                      <label for="s13">Step in Megahertz</label>
                      <input class="s3" type="text" id="s13" tabindex="0" name="step_frequency_mhz"/>
-                     <button id="s14" class="go" tabindex="0">Sweep</button>
+                     <button id="s15" class="go" tabindex="0">Sweep</button>
                  </form>
                  <br/>
                  <div class="result-div"></div>

@@ -77,13 +77,17 @@ function setupTabNavigation(tabs) {
 
 // This function is used for implementing a multi-step workflow.  Each step
 // has its own <div> that is shown in sequence.
-function showStepDiv(divSet, step) {
+function showStepDiv(divSet, step, prepareFunction) {
     // Hide all steps
     $(divSet).find(".step-div").hide()
     // Show the step that was selected
     $(divSet).find(".step-div").eq(step).show()
     // Focus the right control for this step
     $(divSet).find(".step-div").eq(step).find(".step-focus").focus()
+    // Call prepare
+    if (prepareFunction != null) {
+        prepareFunction($(divSet).find(".step-div").eq(step), step)
+    }
 }
 
 function do_sweep(panel) {
@@ -163,7 +167,29 @@ function validateCalibrationRange(panel) {
     }
 }
 
-function doCalStep(panel, step) {
+// This function is called at the start of each calibration step to
+// make any necesary adjustements to the step DIV.
+function prepareCalStepDiv(stepDiv, stepNumber) {
+    // On the first step we take a look at the status of the NanoVNA
+    // and set the button text accordingly
+    if (stepNumber == 0) {
+        params = {
+            step: 0
+        }
+        $.get("/api/calibrate", params)
+        .done(function(data) {
+            if (data == "OK") {
+                $(stepDiv).find(".step-focus").text("Begin calibration")
+            } else {
+                $(stepDiv).find(".step-focus").text("NanoVNA is disconnected, please connect")
+            }
+        });
+    }
+}
+
+// This function is called to perform a calibration step.  This is where
+// we interact with the server/device.
+function doCalStep(panel, step, successCb, errorCb) {
 
     var params;
 
@@ -186,10 +212,6 @@ function doCalStep(panel, step) {
     }
     // STEP 2: Establishes range
     else if (step == 2) {
-        // Make sure the validation passed
-        if ($(panel).find("#s30").data("block-workflow") == true) {
-            return
-        }
         params = {
             step: step,
             start_frequency_mhz: $(panel).find(".s1").val(),
@@ -199,7 +221,11 @@ function doCalStep(panel, step) {
 
     $.get("/api/calibrate", params)
         .done(function(data) {
-            //console.info("Step done " + step)
+            if (data == "OK") {
+                successCb()
+            } else {
+                errorCb()
+            }
         });
 }
 
