@@ -194,6 +194,8 @@ def sweep():
         nanovna.connect_if_necessary(user_config["port"])
 
         # Process request parameters
+        one_row = request.args.get("one_row")
+        
         if request.args.get("cal_preset").strip() == "":
             raise Exception("Calibration preset is missing")
         cal_preset = int(request.args.get("cal_preset"))
@@ -270,16 +272,20 @@ def sweep():
                     "header": "VSWR",
                     "cells": ["{:.02f}".format(v) for v in result_vswrs]
                 },
+            ]
+        }
+        if one_row == "false":
+            result["rows"].append(
                 {
                     "header": "Real(Z)",
                     "cells": ["{:.02f}".format(v) for v in result_real]
-                },
+                })
+            result["rows"].append(
                 {
                     "header": "Imag(Z)",
                     "cells": ["{:.02f}".format(v) for v in result_imaginary]
-                }
-            ]
-        }
+                })
+
         # Tweak the minimum VSWR with the best match annotation
         result.get("headers")[min_index] = result.get("headers")[min_index] + " best match"
         result.get("rows")[0].get("cells")[min_index] = result.get("rows")[0].get("cells")[min_index] + " best match"

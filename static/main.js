@@ -93,7 +93,8 @@ function do_sweep(panel) {
         cal_preset: $(panel).find(".s4").val(),
         start_frequency_mhz: $(panel).find(".s1").val(),
         end_frequency_mhz: $(panel).find(".s2").val(),
-        step_frequency_mhz: $(panel).find(".s3").val()
+        step_frequency_mhz: $(panel).find(".s3").val(),
+        one_row: "true"
     }
 
     // Load up the sweep table user server-side data
@@ -114,7 +115,8 @@ function do_complex_sweep(panel) {
         cal_preset: $(panel).find(".s4").val(),
         start_frequency_mhz: $(panel).find(".s1").val(),
         end_frequency_mhz: $(panel).find(".s2").val(),
-        step_frequency_mhz: $(panel).find(".s3").val()
+        step_frequency_mhz: $(panel).find(".s3").val(),
+        one_row: "false"
     }
 
     // Load up the sweep table user server-side data
