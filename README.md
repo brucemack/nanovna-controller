@@ -13,7 +13,7 @@ Precise Installation Instructions
   - Set the workdir to a location where you'd like to store working files created by the controller.    
   - Set the port you want to listen on for HTTP connections.
 * Open a command prompt 
-* Change directories (cd) into the folder where the files were unzipped.
+* Change directories (cd) into the base folder where the files were unzipped.
 * Run the nanovna-controller.exe 
 * Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.
