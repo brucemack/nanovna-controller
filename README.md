@@ -5,6 +5,19 @@ that allows the user to perform VSWR sweeps of antennas or other devices.  Calib
 
 This program was designed by N1FMV and KC1FSZ.
 
+Precise Installation Instructions
+=================================
+* Download nanovna-controller.zip from the release area: https://github.com/brucemack/nanovna-controller/releases
+* Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
+* Edit the config.ini file:
+  - Set the workdir to a location where you'd like to store working files created by the controller.    
+  - Set the port you want to listen on for HTTP connections.
+* Open a command prompt 
+* Change directories (cd) into the folder where the files were unzipped.
+* Run the nanovna-controller.exe 
+* Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file.
+* Use the Administration tab to configure the serial port where the NanoVNA is connected.
+
 NanoVNA Technical Information
 ============================
 The data command causes the NanoVNA to return a list of reflection coefficients in real/imaginary pairs.  Each line contains one coefficient and the real/imaginary parts are space-delimited.
@@ -13,8 +26,8 @@ Gamma is the magnitude of the complex reflect coefficient.
 
 VSWR = (1+Gamma)/(1-Gamma)
 
-One Time Setup
-==============
+One Time Setup For Development
+==============================
 On Windows:
 
 * python -m venv dev
@@ -71,16 +84,6 @@ Links
 =====
 * Prototype UI: https://brucemack.github.io/nanovna 
 * NanoVNA command reference: https://4ham.ru/wp-content/uploads/2020/05/NanoVNA_Console_Commands_Dec-9-19-1.pdf
-
-Precise Installation Instructions
-=================================
-* Download nanovna-controller.zip
-* Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
-* Edit the config.ini file:
-  - Set the workdir to a location where you'd like to store working files created by the controller.    
-  - Set the port you want to listen on for HTTP connections.
-* Open a command prompt and run the nanovna-controller.exe 
-* Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file
 
 Change Notes
 ============
