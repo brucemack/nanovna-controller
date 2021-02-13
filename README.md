@@ -112,12 +112,13 @@ Screenshots
 ===========
 
 Here are some pictures of what the HTML screens look like.  You might be thinking 
-that this UI is not very impressive, but please keep in mind that 
-one of the design objectives is to make the application easy to use
+that the UI is not very impressive, but please keep in mind that 
+one of the design objectives was to create an application that is easy to use
 for visually-impaired operators.  The HTML has been structured 
 using semantic mark-up and ARIA tags so that it can be integrated smoothly with 
-the Microsoft Narrator screen reader.  I am very new to this technology but it
-is very interesting.
+the Microsoft Narrator screen reader.  I am new to this technology but I find it
+quite interesting.  I would welcome comments from people with more experience in 
+this area.
 
 The sweep panel:
 
