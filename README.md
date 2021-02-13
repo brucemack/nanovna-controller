@@ -107,3 +107,30 @@ Version 2
 Version 1
 ---------
 * Initial version
+
+Screenshots
+===========
+
+Here are some pictures of what the HTML screens look like.  You might be thinking 
+that this UI is not very impressive, but please keep in mind that 
+one of the design objectives is to make the application easy to use
+for visually-impaired operators.  The HTML has been structured 
+using semantic mark-up and ARIA tags so that it can be integrated smoothly with 
+the Microsoft Narrator screen reader.  I am very new to this technology but it
+is very interesting.
+
+The sweep panel:
+
+![Sweep Panel Picture](docs/s1.png)
+
+The complex sweep panel:
+
+![Complex Sweep Panel Picture](docs/cs1.png)
+
+The administration panel:
+
+![Administration Panel Picture](docs/ap1.png)
+
+The status panel:
+
+![Status Panel Picture](docs/sp.png)

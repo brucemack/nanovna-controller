@@ -168,7 +168,7 @@ function validateCalibrationRange(panel) {
 }
 
 // This function is called at the start of each calibration step to
-// make any necesary adjustements to the step DIV.
+// make any necessary adjustments to the step DIV.
 function prepareCalStepDiv(stepDiv, stepNumber) {
     // On the first step we take a look at the status of the NanoVNA
     // and set the button text accordingly
