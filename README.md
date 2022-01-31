@@ -3,6 +3,8 @@ Overview
 This is a simple control interface for the NanoVNA.  An HTML interface is provided 
 that allows the user to perform VSWR sweeps of antennas or other devices.  Calibration is also possible using the interface.
 
+Why an HTML interface?  Among other reasons, this makes the NanoVNA compatible with screen reader technology.
+
 This program was designed by N1FMV and KC1FSZ.
 
 Precise Installation Instructions
