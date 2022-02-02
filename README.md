@@ -25,17 +25,22 @@ Precise Installation Instructions (LINUX)
 
 * Make sure you have Pytnon 3.7.3 or greater installed.
 * Clone the Github repo:
+
       git clone git clone https://github.com/brucemack/nanovna-controller.git
       cd nanovna-controller
 * Setup a virtual environment:
+
       python3 -m venv venv
 * Activate the virtual environment:
+
       . venv/vin/activate
 * Install the required packages:
+
       pip install pyserial
       pip install Flask
       pip install numpy
 * Launch the server:
+
       python main.py
 * Point your browser to http://localhost:8081.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.  On Linux this would typically be something like /dev/ttyACM0.
