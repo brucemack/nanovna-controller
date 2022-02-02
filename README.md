@@ -25,11 +25,11 @@ Precise Installation Instructions (LINUX)
 
 * Make sure you have a Git client installed.
 * Make sure you have Pytnon 3.7.3 or greater installed.
-* Clone the Github repo:
+* Clone the Github repo and change into the project directory:
 
       git clone git clone https://github.com/brucemack/nanovna-controller.git
       cd nanovna-controller
-* Setup a virtual environment:
+* Setup a Python virtual environment:
 
       python3 -m venv venv
 * Activate the virtual environment by sourcing the activate script:
