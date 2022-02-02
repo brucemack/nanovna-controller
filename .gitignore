@@ -5,5 +5,7 @@ log.txt
 build/
 dist/
 dev/
+venv/
+
 
 

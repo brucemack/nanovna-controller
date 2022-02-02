@@ -7,8 +7,8 @@ Why an HTML interface?  Among other reasons, this makes the NanoVNA compatible w
 
 This program was designed by N1FMV and KC1FSZ.
 
-Precise Installation Instructions
-=================================
+Precise Installation Instructions (Windows)
+===========================================
 * Download nanovna-controller.zip from the release area: https://github.com/brucemack/nanovna-controller/releases
 * Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
 * Edit the config.ini file:
@@ -19,6 +19,37 @@ Precise Installation Instructions
 * Run the nanovna-controller.exe 
 * Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.
+
+Precise Installation Instructions (LINUX)
+=========================================
+
+* Make sure you have Pytnon 3.7.3 or greater installed.
+* Clone the Github repo:
+
+      git clone git clone https://github.com/brucemack/nanovna-controller.git
+      cd nanovna-controller
+
+* Setup a virtual environment:
+
+      python3 -m venv venv
+
+* Activate the virtual environment:
+
+      . venv/vin/activate
+
+* Install the required packages:
+
+      pip install pyserial
+      pip install Flask
+      pip install numpy
+
+* Launch the server:
+
+      python main.py
+
+* Point your browser to http://localhost:8081.  Or use whatever port number you have configured in the config.ini file.
+* Use the Administration tab to configure the serial port where the NanoVNA is connected.  On Linux this would typically be something like /dev/ttyACM0.
+* Use the Status tab to validate that the NanoVNA is connected and responding to commands.
 
 NanoVNA Technical Information
 ============================
@@ -38,6 +69,7 @@ On Windows:
 * pip install pyserial
 * pip install Flask
 * pip install PyInstaller
+* pip install numpy==1.19.3
 
 Resolvoing Numpy Problen on Windows 10 2004
 --------------------------------------------
