@@ -23,6 +23,7 @@ Precise Installation Instructions (Windows)
 Precise Installation Instructions (LINUX)
 =========================================
 
+* Make sure you have a Git client installed.
 * Make sure you have Pytnon 3.7.3 or greater installed.
 * Clone the Github repo:
 
@@ -31,10 +32,10 @@ Precise Installation Instructions (LINUX)
 * Setup a virtual environment:
 
       python3 -m venv venv
-* Activate the virtual environment:
+* Activate the virtual environment by sourcing the activate script:
 
       . venv/vin/activate
-* Install the required packages:
+* Install the required Python packages:
 
       pip install pyserial
       pip install Flask
