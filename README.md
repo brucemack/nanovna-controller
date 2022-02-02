@@ -23,6 +23,8 @@ Precise Installation Instructions (Windows)
 Precise Installation Instructions (LINUX)
 =========================================
 
+Follow these instructions the first time you are installing/running the controller:
+
 * Make sure you have a Git client installed.
 * Make sure you have Pytnon 3.7.3 or greater installed.
 * Clone the Github repo and change into the project directory:
@@ -46,6 +48,12 @@ Precise Installation Instructions (LINUX)
 * Point your browser to http://localhost:8081.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.  On Linux this would typically be something like /dev/ttyACM0.
 * Use the Status tab to validate that the NanoVNA is connected and responding to commands.
+
+Once everything is installed the first time you can run it using these commands:
+
+      cd nanovna-controller
+      . venv/vin/activate
+      python main.py
 
 NanoVNA Technical Information
 ============================
