@@ -36,7 +36,7 @@ Follow these instructions the first time you are installing/running the controll
       python3 -m venv venv
 * Activate the virtual environment by sourcing the activate script:
 
-      . venv/vin/activate
+      . venv/bin/activate
 * Install the required Python packages:
 
       pip install pyserial
@@ -52,7 +52,7 @@ Follow these instructions the first time you are installing/running the controll
 Once everything is installed the first time you can run it using these commands:
 
       cd nanovna-controller
-      . venv/vin/activate
+      . venv/bin/activate
       python main.py
 
 NanoVNA Technical Information
