@@ -65,10 +65,10 @@ One Time Setup For Development
 ==============================
 On Windows:
 
-* python -m venv dev
-* dev\Scripts\activate.bat
-* python -m pip install --upgrade pip
-* pip install -r requirements-windows.txt
+      python -m venv dev
+      dev\Scripts\activate.bat
+      python -m pip install --upgrade pip
+      pip install -r requirements-windows.txt
 
 Resolvoing Numpy Problen on Windows 10 2004
 --------------------------------------------
@@ -77,13 +77,13 @@ This is needed to work around a bug in Windows 10 2004.  See https://developerco
 Microsoft is supposed to have this problem fixed in the next update 
 of Windows 10.
 
-pip install numpy==1.19.3
+      pip install numpy==1.19.3
 
 Running (Development Mode)
 ==========================
 Windows, command-line, development:
 
-* python main.py
+      python main.py
 
 Building Requirements
 =====================
