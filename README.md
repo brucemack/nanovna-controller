@@ -31,7 +31,7 @@ Follow these instructions the first time you are installing/running the controll
 
       git clone git clone https://github.com/brucemack/nanovna-controller.git
       cd nanovna-controller
-* Setup a Python virtual environment:
+* Setup a Python virtual environment (called venv in this case):
 
       python3 -m venv venv
 * Activate the virtual environment by sourcing the activate script:
@@ -39,9 +39,7 @@ Follow these instructions the first time you are installing/running the controll
       . venv/bin/activate
 * Install the required Python packages:
 
-      pip install pyserial
-      pip install Flask
-      pip install numpy
+      pip install -r requirements.txt
 * Launch the server:
 
       python main.py
@@ -70,10 +68,7 @@ On Windows:
 * python -m venv dev
 * dev\Scripts\activate.bat
 * python -m pip install --upgrade pip
-* pip install pyserial
-* pip install Flask
-* pip install PyInstaller
-* pip install numpy==1.19.3
+* pip install -r requirements-windows.txt
 
 Resolvoing Numpy Problen on Windows 10 2004
 --------------------------------------------

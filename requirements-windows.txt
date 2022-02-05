@@ -1,0 +1,7 @@
+pyserial
+Flask
+# Please see README for description of strange Windows issue
+numpy == 1.19.3
+# Needed if you are building binary distributions
+PyInstaller
+
