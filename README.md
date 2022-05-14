@@ -12,8 +12,8 @@ Precise Installation Instructions (Windows)
 * Download nanovna-controller.zip from the release area: https://github.com/brucemack/nanovna-controller/releases
 * Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
 * Edit the config.ini file:
-  - Set the workdir to a location where you'd like to store working files created by the controller.    
-  - Set the port you want to listen on for HTTP connections.
+  - Set the workdir to a location where you'd like to store working files created by the controller (i.e., user config files)
+  - Set the TCP port you want to listen on for HTTP connections.
 * Open a command prompt 
 * Change directories (cd) into the base folder where the files were unzipped.
 * Run the nanovna-controller.exe 
@@ -26,20 +26,23 @@ Precise Installation Instructions (LINUX)
 Follow these instructions the first time you are installing/running the controller:
 
 * Make sure you have a Git client installed.
-* Make sure you have Pytnon 3.7.3 or greater installed.
+* Make sure you have Python 3.7.3 or greater installed.
 * Clone the Github repo and change into the project directory:
 
       git clone git clone https://github.com/brucemack/nanovna-controller.git
       cd nanovna-controller
-* Setup a Python virtual environment (called venv in this case):
+* Setup a Python virtual environment (called dev in this case):
 
-      python3 -m venv venv
+      python3 -m venv dev
 * Activate the virtual environment by sourcing the activate script:
 
-      . venv/bin/activate
+      . dev/bin/activate
 * Install the required Python packages:
 
       pip install -r requirements.txt
+* Edit the config.ini file:
+  - Set the work directory to a location where you'd like to store working files created by the controller (i.e., user config files)
+  - Set the TCP port you want to listen on for HTTP connections.
 * Launch the server:
 
       python main.py
@@ -70,15 +73,6 @@ On Windows:
       python -m pip install --upgrade pip
       pip install -r requirements-windows.txt
 
-Resolvoing Numpy Problen on Windows 10 2004
---------------------------------------------
-This is needed to work around a bug in Windows 10 2004.  See https://developercommunity.visualstudio.com/content/problem/1207405/fmod-after-an-update-to-windows-2004-is-causing-a.html
-
-Microsoft is supposed to have this problem fixed in the next update 
-of Windows 10.
-
-      pip install numpy==1.19.3
-
 Running (Development Mode)
 ==========================
 Windows, command-line, development:
@@ -89,6 +83,7 @@ Building Requirements
 =====================
 * pyserial - For serial communications to the NanoVNA
 * Flask - Needed for web serving
+* numpy
 
 PyInstaller Packaging
 =====================
@@ -121,6 +116,12 @@ Links
 Change Notes
 ============
 
+Version 4
+---------
+* If the user has not explicitly defined a serial port, we now default to use the first USB serial port found on the machine.  (Thanks to Chris VE3RWJ)
+* Other logging cleanups to cut down on clutter
+* Removed the numpy work-around since Windows 10 has cleaned up the fmod error.
+
 Version 3
 ---------
 * Major rework of calibration process.
@@ -135,7 +136,7 @@ Version 2
 * Defaults to COM6
 * Able to auto-sense the base dir
 * Error checks for config.ini and static dir
-* Changing numpuy version to address Windows bug
+* Changing numpy version to address Windows bug
 
 Version 1
 ---------

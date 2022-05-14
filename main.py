@@ -12,23 +12,39 @@ import configparser
 import sys
 import os
 
-VERSION = "3"
-base_dir_2 = os.path.dirname(os.path.realpath(__file__))
+def load_user_config():
+    try:
+        with open(static_config["workdir"] + "/userconfig.json") as f:
+            return json.load(f)
+    except Exception as ex:
+        logging.warning("No user configuration setup yet")
+        return {}
 
+
+def save_user_config():
+    with open(static_config["workdir"] + "/userconfig.json", "w") as f:
+        json.dump(user_config, f)
+
+VERSION = "4"
+
+# Determine where the script is actually running from 
+run_base_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Check to see if the user specified an explicit base directory
 if len(sys.argv) >= 2:
-    # Get static location
     base_dir = sys.argv[1]
 else:
-    base_dir = base_dir_2
+    base_dir = run_base_dir
 
 # Configure logging
-logging.basicConfig(filename=base_dir + "/log.txt", format='%(asctime)s %(message)s', level=logging.INFO)
+logging.basicConfig(filename=base_dir + "/log.txt", 
+    format='%(asctime)s %(message)s', level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-logging.info("NanoVNA Controller")
-logging.info("Version " + VERSION)
-logging.info("Running from " + base_dir_2)
-logging.info("Base Directory " + base_dir)
+logging.info("KC1FSZ NanoVNA Controller")
+logging.info("Version is " + VERSION)
+logging.info("Running from " + run_base_dir)
+logging.info("Base directory is " + base_dir)
 
 # Make sure the config file and static directories exist
 if not os.path.exists(base_dir + "/config.ini"):
@@ -46,40 +62,28 @@ static_config = config["DEFAULT"]
 logging.info("Working directory is " + static_config["workdir"])
 logging.info("Listen port is " + static_config["listenport"])
 
-user_config = { }
 calibration_config = { }
+visible_ports = nv.Nanovna.list_serial_ports()
 
-
-def load_user_config():
-    global user_config
-    try:
-        with open(static_config["workdir"] + "/userconfig.json") as f:
-            user_config = json.load(f)
-    except Exception as ex:
-        logging.warning("Unable to read user configuration")
-        user_config = {}
-
-    # Program some defaults
-    if not ("port" in user_config):
-        user_config["port"] = "COM6"
-
-
-def save_user_config():
-    with open(static_config["workdir"] + "/userconfig.json", "w") as f:
-        json.dump(user_config, f)
-        logging.info("Saved user configuration")
-        logging.info(user_config)
-
+for p in visible_ports:
+    logging.info("Found a serial port " + p)
 
 # Initial load of configuration properties
-load_user_config()
+user_config = load_user_config()
 
-logging.info("Configured USB port is " + user_config["port"])
+# Default the USB port if none has been explicitly defined in the config
+if not ("port" in user_config):
+    if len(visible_ports):
+        user_config["port"] = visible_ports[0]
+    else:    
+        user_config["port"] = "COM6"
+    logging.info("Defaulted serial port to " + user_config["port"])
+    # Force a save to get the default
+    save_user_config()
+else:
+    logging.info("Using configured serial port " + user_config["port"])
 
 nanovna = nv.Nanovna()
-
-for p in nanovna.list_serial_ports():
-    logging.info("Found USB port " + p)
 
 # Flask routes
 cli.show_server_banner = lambda *_: None

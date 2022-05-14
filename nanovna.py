@@ -118,6 +118,8 @@ class Nanovna:
         else:
             raise EnvironmentError('Unsupported platform')
 
+        # This is somewhat crude, but it's the only way I know to check for the 
+        # existence of a COMx port on Windows.
         result = []
         for port in ports:
             try:
