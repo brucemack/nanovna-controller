@@ -74,10 +74,19 @@ user_config = load_user_config()
 # Default the USB port if none has been explicitly defined in the config
 if not ("port" in user_config):
     if len(visible_ports):
-        user_config["port"] = visible_ports[0]
+        if len(visible_ports) == 1:
+            user_config["port"] = visible_ports[0]
+        else:
+            # Try to avoid COM1 on Windows (generally not the NanoVNA)
+            for p in visible_ports: 
+                if p != "COM1":
+                    user_config["port"] = p
+                    break
     else:    
         user_config["port"] = "COM6"
+
     logging.info("Defaulted serial port to " + user_config["port"])
+
     # Force a save to get the default
     save_user_config()
 else:
