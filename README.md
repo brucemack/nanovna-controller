@@ -16,7 +16,9 @@ Precise Installation Instructions (Windows)
   - Set the TCP port you want to listen on for HTTP connections.
 * Open a command prompt.
 * Run the nanovna-controller.exe passing an argument of the base folder.  For example:
-    nanovna-controller c:\nano
+
+            nanovna-controller c:\nano
+
 * Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.
 
