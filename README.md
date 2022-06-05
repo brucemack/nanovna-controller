@@ -19,7 +19,7 @@ Precise Installation Instructions (Windows)
 
             nanovna-controller c:\nano
 
-* Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file.
+* Point your browser to http://localhost:8081.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.
 
 Precise Installation Instructions (LINUX)
