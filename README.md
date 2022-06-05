@@ -10,13 +10,13 @@ This program was designed by N1FMV and KC1FSZ.
 Precise Installation Instructions (Windows)
 ===========================================
 * Download nanovna-controller.zip from the release area: https://github.com/brucemack/nanovna-controller/releases
-* Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.
-* Edit the config.ini file:
+* Unzip the file.  This will create a base folder that contains the .exe, the config.ini file, and a static folder.  For example: C:\nano.
+* Edit the config.ini file in the base folder:
   - Set the workdir to a location where you'd like to store working files created by the controller (i.e., user config files)
   - Set the TCP port you want to listen on for HTTP connections.
-* Open a command prompt 
-* Change directories (cd) into the base folder where the files were unzipped.
-* Run the nanovna-controller.exe 
+* Open a command prompt.
+* Run the nanovna-controller.exe passing an argument of the base folder.  For example:
+    nanovna-controller c:\nano
 * Point your browser to http://localhost:8080.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.
 
