@@ -119,6 +119,10 @@ Links
 Change Notes
 ============
 
+Version 5
+---------
+* Added series capacitance, series inductance, impedance magnitude, S11 phase, S11 return loss to the complex sweep panel
+
 Version 4
 ---------
 * If the user has not explicitly defined a serial port, we now default to use the first USB serial port found on the machine (but not COM1).  (Thanks to Chris VE3RWJ)
