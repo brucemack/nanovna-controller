@@ -10,20 +10,22 @@ def remove_point1(x):
     else:
         return x
 
-def fmt_si(r):
+def fmt_si(r, suffix):
     # Round to three significant digits first 
     rr = round_it(r, 3)
+    if rr < 0:
+        return ""
     # Figure out the scale of the rounded number
     places = log10(rr)
     if places < -12.0:
-        return str(rr)
+        return str(rr) + " " + suffix
     elif places < -9.0:
-        return remove_point1(str(round_it(rr * 1e12, 3))) + "p" 
+        return remove_point1(str(round_it(rr * 1e12, 3))) + "p" + suffix
     elif places < -6.0:
-        return remove_point1(str(round_it(rr * 1e9, 3))) + "n" 
+        return remove_point1(str(round_it(rr * 1e9, 3))) + " n" + suffix 
     elif places < -3.0:
-        return remove_point1(str(round_it(rr * 1e6, 3))) + "u" 
+        return remove_point1(str(round_it(rr * 1e6, 3))) + " u" + suffix 
     elif places < 0.0:
-        return remove_point1(str(round_it(rr * 1e3, 3))) + "m" 
+        return remove_point1(str(round_it(rr * 1e3, 3))) + " m" + suffix 
     else:
-        return remove_point1(str(round_it(rr, 3)))
+        return remove_point1(str(round_it(rr, 3))) + " " + suffix

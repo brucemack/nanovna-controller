@@ -299,7 +299,7 @@ def sweep():
             result_c.append(c)
 
             l = interp(frequency_list, l_list, frequency)
-            result_c.append(l)
+            result_l.append(l)
 
         # Find the lowest value
         min_vswr = min(result_vswr)
@@ -330,23 +330,23 @@ def sweep():
                 })
             result["rows"].append(
                 {
-                    "header": "S11",
-                    "cells": ["{:.02f}".format(v) for v in result_s11]
+                    "header": "S11 Return Loss",
+                    "cells": [ "{:.02f}".format(v) for v in result_s11]
                 })
             result["rows"].append(
                 {
                     "header": "Series C",
-                    "cells": [ util.format_si(v) + "F" for v in result_c]
+                    "cells": [ util.fmt_si(v, "F") for v in result_c]
                 })
             result["rows"].append(
                 {
                     "header": "Series L",
-                    "cells": [ util.format_si(v) + "H" for v in result_l]
+                    "cells": [ util.fmt_si(v, "H") for v in result_l]
                 })
 
         # Tweak the minimum VSWR with the best match annotation
         result.get("headers")[min_index] = result.get("headers")[min_index] + " best match"
-        result.get("rows")[0].get("cells")[min_index] = result.get("rows")[0].get("cells")[min_index] + " best match"
+        #result.get("rows")[0].get("cells")[min_index] = result.get("rows")[0].get("cells")[min_index] + " best match"
 
         return jsonify(result)
 
