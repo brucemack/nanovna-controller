@@ -12,6 +12,7 @@ import configparser
 import sys
 import os
 import util
+import math, cmath 
 
 def load_user_config():
     try:
@@ -26,7 +27,7 @@ def save_user_config():
     with open(static_config["workdir"] + "/userconfig.json", "w") as f:
         json.dump(user_config, f)
 
-VERSION = "4"
+VERSION = "5"
 
 # Determine where the script is actually running from 
 run_base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -278,6 +279,8 @@ def sweep():
         result_vswr = []
         result_zr = []
         result_zi = []
+        result_zmag = []
+        result_zphase = []
         result_s11 = []
         result_c = []
         result_l = []
@@ -291,6 +294,8 @@ def sweep():
             z = interp(frequency_list, z_list, frequency)
             result_zr.append(z.real)
             result_zi.append(z.imag)
+            result_zmag.append(abs(z))
+            result_zphase.append(math.degrees(cmath.phase(z)))
 
             s11 = interp(frequency_list, s11_list, frequency)
             result_s11.append(s11)
@@ -330,8 +335,18 @@ def sweep():
                 })
             result["rows"].append(
                 {
+                    "header": "Mag(Z)",
+                    "cells": ["{:.02f}".format(v) for v in result_zmag]
+                })
+            result["rows"].append(
+                {
+                    "header": "Phase(Z)",
+                    "cells": ["{:.00f}".format(v) for v in result_zphase]
+                })
+            result["rows"].append(
+                {
                     "header": "S11 Return Loss",
-                    "cells": [ "{:.02f}".format(v) for v in result_s11]
+                    "cells": [ "{:.00f}".format(v) for v in result_s11]
                 })
             result["rows"].append(
                 {
