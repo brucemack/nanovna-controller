@@ -11,6 +11,7 @@ import logging
 import configparser
 import sys
 import os
+import util
 
 def load_user_config():
     try:
@@ -249,32 +250,61 @@ def sweep():
         # Get the battery voltage in volts
         #vbat_lines = nv.run_command(ser, "vbat")
         #vbat = float(vbat_lines[0][:-2]) / 1000
+        
         # Collect the frequencies of the sweep
         lines = nanovna.run_command("frequencies")
         frequency_list = [float(line) for line in lines]
-        # Make the VSWR data
+        # Collect the reflection coefficients of the sweep
         rc_list = nanovna.get_complex_data()
+        if len(frequency_list) != len(rc_list):
+            raise Exception("Data length error")
+
         # Convert to VSWR
         vswr_list = [nanovna.reflection_coefficient_to_vswr(rc) for rc in rc_list]
         z_list = [nanovna.reflection_coefficient_to_z(rc) for rc in rc_list]
+        s11_list = [nanovna.reflection_coefficient_to_s11(rc) for rc in rc_list]
+        # Make up the C and L data
+        c_list = []
+        l_list = []
+        for i in range(0, len(frequency_list)):
+            c_list.append(nanovna.reflection_coefficient_to_c(rc_list[i], frequency_list[i]))
+            l_list.append(nanovna.reflection_coefficient_to_l(rc_list[i], frequency_list[i]))
+
         # Re-sample using the start/end/step provided by the user.  Linear
         # interpolation is automatically used
         frequency_space = np.linspace(start_frequency, end_frequency - step_frequency, step_count)
         result_frequencies = []
-        result_vswrs = []
-        result_real = []
-        result_imaginary = []
+
+        result_vswr = []
+        result_zr = []
+        result_zi = []
+        result_s11 = []
+        result_c = []
+        result_l = []
+
         for frequency in frequency_space:
             result_frequencies.append(frequency)
+            
             vswr = interp(frequency_list, vswr_list, frequency)
-            result_vswrs.append(vswr)
+            result_vswr.append(vswr)
+            
             z = interp(frequency_list, z_list, frequency)
-            result_real.append(z.real)
-            result_imaginary.append(z.imag)
+            result_zr.append(z.real)
+            result_zi.append(z.imag)
+
+            s11 = interp(frequency_list, s11_list, frequency)
+            result_s11.append(s11)
+
+            c = interp(frequency_list, c_list, frequency)
+            result_c.append(c)
+
+            l = interp(frequency_list, l_list, frequency)
+            result_c.append(l)
+
         # Find the lowest value
-        min_vswr = min(result_vswrs)
+        min_vswr = min(result_vswr)
         for i in range(len(result_frequencies)):
-            if result_vswrs[i] == min_vswr:
+            if result_vswr[i] == min_vswr:
                 min_index = i
         # Format the result
         result = {
@@ -283,7 +313,7 @@ def sweep():
             "rows": [
                 {
                     "header": "VSWR",
-                    "cells": ["{:.02f}".format(v) for v in result_vswrs]
+                    "cells": ["{:.02f}".format(v) for v in result_vswr]
                 },
             ]
         }
@@ -291,12 +321,27 @@ def sweep():
             result["rows"].append(
                 {
                     "header": "Real(Z)",
-                    "cells": ["{:.02f}".format(v) for v in result_real]
+                    "cells": ["{:.02f}".format(v) for v in result_zr]
                 })
             result["rows"].append(
                 {
                     "header": "Imag(Z)",
-                    "cells": ["{:.02f}".format(v) for v in result_imaginary]
+                    "cells": ["{:.02f}".format(v) for v in result_zi]
+                })
+            result["rows"].append(
+                {
+                    "header": "S11",
+                    "cells": ["{:.02f}".format(v) for v in result_s11]
+                })
+            result["rows"].append(
+                {
+                    "header": "Series C",
+                    "cells": [ util.format_si(v) + "F" for v in result_c]
+                })
+            result["rows"].append(
+                {
+                    "header": "Series L",
+                    "cells": [ util.format_si(v) + "H" for v in result_l]
                 })
 
         # Tweak the minimum VSWR with the best match annotation
