@@ -295,7 +295,9 @@ def sweep():
             result_zr.append(z.real)
             result_zi.append(z.imag)
             result_zmag.append(abs(z))
-            result_zphase.append(math.degrees(cmath.phase(z)))
+
+            rc = interp(frequency_list, rc_list, frequency)
+            result_zphase.append(np.angle(rc, True))
 
             s11 = interp(frequency_list, s11_list, frequency)
             result_s11.append(s11)
@@ -325,28 +327,18 @@ def sweep():
         if one_row == "false":
             result["rows"].append(
                 {
-                    "header": "Real(Z)",
+                    "header": "Real Z",
                     "cells": ["{:.02f}".format(v) for v in result_zr]
                 })
             result["rows"].append(
                 {
-                    "header": "Imag(Z)",
+                    "header": "Imag Z",
                     "cells": ["{:.02f}".format(v) for v in result_zi]
                 })
             result["rows"].append(
                 {
-                    "header": "Mag(Z)",
+                    "header": "Magnitude Z",
                     "cells": ["{:.02f}".format(v) for v in result_zmag]
-                })
-            result["rows"].append(
-                {
-                    "header": "Phase(Z)",
-                    "cells": ["{:.00f}".format(v) for v in result_zphase]
-                })
-            result["rows"].append(
-                {
-                    "header": "S11 Return Loss",
-                    "cells": [ "{:.00f}".format(v) for v in result_s11]
                 })
             result["rows"].append(
                 {
@@ -357,6 +349,16 @@ def sweep():
                 {
                     "header": "Series L",
                     "cells": [ util.fmt_si(v, "H") for v in result_l]
+                })
+            result["rows"].append(
+                {
+                    "header": "S11 Return Loss",
+                    "cells": [ "{:.00f}".format(v) for v in result_s11]
+                })
+            result["rows"].append(
+                {
+                    "header": "S11 Phase",
+                    "cells": ["{:.00f}".format(v) for v in result_zphase]
                 })
 
         # Tweak the minimum VSWR with the best match annotation

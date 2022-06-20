@@ -20,7 +20,7 @@ def fmt_si(r, suffix):
     if places < -12.0:
         return str(rr) + " " + suffix
     elif places < -9.0:
-        return remove_point1(str(round_it(rr * 1e12, 3))) + "p" + suffix
+        return remove_point1(str(round_it(rr * 1e12, 3))) + " p" + suffix
     elif places < -6.0:
         return remove_point1(str(round_it(rr * 1e9, 3))) + " n" + suffix 
     elif places < -3.0:
