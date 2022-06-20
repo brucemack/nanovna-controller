@@ -120,7 +120,7 @@ Change Notes
 
 Version 4
 ---------
-* If the user has not explicitly defined a serial port, we now default to use the first USB serial port found on the machine.  (Thanks to Chris VE3RWJ)
+* If the user has not explicitly defined a serial port, we now default to use the first USB serial port found on the machine (but not COM1).  (Thanks to Chris VE3RWJ)
 * Other logging cleanups to cut down on clutter
 * Removed the numpy work-around since Windows 10 has cleaned up the fmod error.
 
