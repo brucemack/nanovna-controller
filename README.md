@@ -33,6 +33,7 @@ Follow these instructions the first time you are installing/running the controll
 
       git clone git clone https://github.com/brucemack/nanovna-controller.git
       cd nanovna-controller
+* The location of your repo is called the base directory. 
 * Setup a Python virtual environment (called dev in this case):
 
       python3 -m venv dev
@@ -42,12 +43,12 @@ Follow these instructions the first time you are installing/running the controll
 * Install the required Python packages:
 
       pip install -r requirements.txt
-* Edit the config.ini file:
+* Edit the config.ini file in your base directory:
   - Set the work directory to a location where you'd like to store working files created by the controller (i.e., user config files)
   - Set the TCP port you want to listen on for HTTP connections.
-* Launch the server:
+* Launch the server by running main.py.  Pass the location of your base directory, which is most likely the current directory: 
 
-      python main.py
+      python main.py .
 * Point your browser to http://localhost:8081.  Or use whatever port number you have configured in the config.ini file.
 * Use the Administration tab to configure the serial port where the NanoVNA is connected.  On Linux this would typically be something like /dev/ttyACM0.
 * Use the Status tab to validate that the NanoVNA is connected and responding to commands.
@@ -56,7 +57,7 @@ Once everything is installed the first time you can run it using these commands:
 
       cd nanovna-controller
       . venv/bin/activate
-      python main.py
+      python main.py .
 
 NanoVNA Technical Information
 ============================

@@ -3,6 +3,7 @@ import logging
 import serial
 import glob
 import sys
+import math
 
 
 class Nanovna:
@@ -98,6 +99,36 @@ class Nanovna:
         Z = Zo * ((1 + Γ) / (1 - Γ))
         """
         return 50.0 * (1.0 + rc) / (1 - rc)
+
+    @staticmethod
+    def reflection_coefficient_to_s11(rc):
+        """
+        s11 = 20 * log10(mag(Γ))
+        """
+        gamma = abs(rc)
+        return 20.0 * math.log10(gamma)
+
+    @staticmethod
+    def reflection_coefficient_to_c(rc, f):
+        """
+        Z = Zo * ((1 + Γ) / (1 - Γ))
+        C = -1 / (w * Zi)
+        """
+        z = 50.0 * (1.0 + rc) / (1 - rc)
+        w = 2 * math.pi * f
+        return -1 / (w * z.imag)
+
+    @staticmethod
+    def reflection_coefficient_to_l(rc, f):
+        """
+        Z = Zo * ((1 + Γ) / (1 - Γ))
+        L = Zl / w
+        """
+        z = 50.0 * (1.0 + rc) / (1 - rc)
+        w = 2 * math.pi * f
+        return z.imag / w
+
+
 
     @staticmethod
     def list_serial_ports():
