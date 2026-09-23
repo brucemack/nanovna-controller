@@ -184,7 +184,12 @@ def status():
         nanovna.connect_if_necessary(user_config["port"])
         # Execute various status commands
         vbat_lines = nanovna.run_command("vbat")
-        vbat = float(vbat_lines[0][:-2]) / 1000
+        # Some firmware versions don't support vbat
+        try:
+            vbat = float(vbat_lines[0][:-2]) / 1000
+        except (ValueError, IndexError):
+            logging.warning("Unable to read battery voltage: " + str(vbat_lines))
+            vbat = "N/A"
         version_lines = nanovna.run_command("version")
 
         result = {
