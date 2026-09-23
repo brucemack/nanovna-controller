@@ -144,6 +144,10 @@ Links
 Change Notes
 ============
 
+Version 6
+---------
+* Measurements use the NanoVNA's `scan` command when the firmware supports it (fresh data, no fixed wait). Firmwares without a usable `scan` fall back to `sweep` followed by reading `frequencies`/`data`.
+
 Version 5
 ---------
 * Added series capacitance, series inductance, impedance magnitude, S11 phase, S11 return loss to the complex sweep panel
