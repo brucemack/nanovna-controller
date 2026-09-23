@@ -144,6 +144,12 @@ Links
 Change Notes
 ============
 
+Unreleased
+----------
+* Sweep and complex sweep panels now show an analysis below the result table, computed from the full-resolution sweep data:
+  * A list of local VSWR minima and maxima (small noise-level wiggles are ignored).
+  * The frequency ranges where the VSWR is at or below one or more thresholds (new "VSWR Thresholds" field, default "1.2, 1.5"), including the best VSWR within each range.
+
 Version 5
 ---------
 * Added series capacitance, series inductance, impedance magnitude, S11 phase, S11 return loss to the complex sweep panel

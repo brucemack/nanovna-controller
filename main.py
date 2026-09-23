@@ -12,6 +12,7 @@ import configparser
 import sys
 import os
 import util
+import analysis
 import math, cmath 
 
 def load_user_config():
@@ -243,6 +244,7 @@ def sweep():
             raise Exception("There are too many steps")
         if step_count == 0:
             raise Exception("There are not enough steps")
+        vswr_thresholds = analysis.parse_vswr_thresholds(request.args.get("vswr_thresholds", ""))
 
         nanovna.run_command("info")
         nanovna.run_command("recall " + str(cal_preset))
@@ -259,6 +261,9 @@ def sweep():
         rc_list = nanovna.get_complex_data()
         if len(frequency_list) != len(rc_list):
             raise Exception("Data length error")
+
+        # Analyse the full-resolution sweep (before re-sampling) for the summary
+        sweep_analysis = analysis.analyze_sweep(frequency_list, [abs(rc) for rc in rc_list], vswr_thresholds)
 
         # Convert to VSWR
         vswr_list = [nanovna.reflection_coefficient_to_vswr(rc) for rc in rc_list]
@@ -316,6 +321,7 @@ def sweep():
         # Format the result
         result = {
             "error": False,
+            "analysis": sweep_analysis,
             "headers": ["{:.03f}".format(f / 1000000.0) for f in result_frequencies],
             "rows": [
                 {

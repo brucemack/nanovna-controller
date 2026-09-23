@@ -98,6 +98,7 @@ function do_sweep(panel) {
         start_frequency_mhz: $(panel).find(".s1").val(),
         end_frequency_mhz: $(panel).find(".s2").val(),
         step_frequency_mhz: $(panel).find(".s3").val(),
+        vswr_thresholds: $(panel).find(".s5").val(),
         one_row: "true"
     }
 
@@ -120,6 +121,7 @@ function do_complex_sweep(panel) {
         start_frequency_mhz: $(panel).find(".s1").val(),
         end_frequency_mhz: $(panel).find(".s2").val(),
         step_frequency_mhz: $(panel).find(".s3").val(),
+        vswr_thresholds: $(panel).find(".s5").val(),
         one_row: "false"
     }
 

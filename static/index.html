@@ -37,6 +37,7 @@ Designed by N1FMV and KC1FSZ
                     {{/each}}
                 </tbody>
             </table>
+            {{> analysis}}
         </script>
         <script id="template_1" type="text/x-handlebars-template">
             <table>
@@ -64,6 +65,42 @@ Designed by N1FMV and KC1FSZ
                     {{/each}}
                 </tbody>
             </table>
+            {{> analysis}}
+        </script>
+        <script id="template_analysis" type="text/x-handlebars-template">
+            <section class="analysis" aria-label="Sweep analysis">
+                <h2>Local minima and maxima</h2>
+                {{#if analysis.extrema.length}}
+                <ul>
+                    {{#each analysis.extrema}}
+                    <li>{{frequency_mhz}} MHz: VSWR {{vswr}}, {{kind}}</li>
+                    {{/each}}
+                </ul>
+                {{else}}
+                <p>No local minima or maxima within the sweep range.</p>
+                {{/if}}
+                <h2>Ranges below VSWR threshold</h2>
+                {{#each analysis.bands}}
+                <h3>VSWR at or below {{threshold}}</h3>
+                {{#if ranges.length}}
+                <ul>
+                    {{#each ranges}}
+                    <li>
+                        {{start_mhz}} to {{end_mhz}} MHz,
+                        best VSWR {{min_vswr}} at {{min_frequency_mhz}} MHz{{#if open_start}},
+                        continues below sweep start{{/if}}{{#if open_end}},
+                        continues above sweep end{{/if}}
+                    </li>
+                    {{/each}}
+                </ul>
+                {{else}}
+                <p>VSWR does not reach {{threshold}} or lower anywhere in the sweep.</p>
+                {{/if}}
+                {{else}}
+                <p>No VSWR threshold entered, so the range analysis was skipped.</p>
+                {{/each}}
+                <p>Based on {{analysis.point_count}} measured points.</p>
+            </section>
         </script>
         <script id="template_2" type="text/x-handlebars-template">
             <div>
@@ -89,6 +126,7 @@ $(document).ready(function() {
     template_0 = Handlebars.compile($("#template_0").html());
     template_1 = Handlebars.compile($("#template_1").html());
     template_2 = Handlebars.compile($("#template_2").html());
+    Handlebars.registerPartial("analysis", $("#template_analysis").html());
 
     setupTabNavigation($(".tabs"))
 
@@ -242,6 +280,8 @@ $(document).ready(function() {
                      <input class="s2" type="text" id="s12" tabindex="0" name="end_frequency_mhz"/>
                      <label for="s13">Step in Megahertz</label>
                      <input class="s3" type="text" id="s13" tabindex="0" name="step_frequency_mhz"/>
+                     <label for="s16">VSWR Thresholds, comma-separated</label>
+                     <input class="s5" type="text" id="s16" tabindex="0" name="vswr_thresholds" value="1.2, 1.5"/>
                      <button id="s15" class="go" tabindex="0">Sweep</button>
                  </form>
                  <br/>
@@ -270,6 +310,8 @@ $(document).ready(function() {
                      <input class="s2" type="text" id="s22"  tabindex="0" name="end_frequency_mhz"/>
                      <label for="s23">Step in Megahertz</label>
                      <input class="s3" type="text" id="s23"  tabindex="0" name="step_frequency_mhz"/>
+                     <label for="s25">VSWR Thresholds, comma-separated</label>
+                     <input class="s5" type="text" id="s25"  tabindex="0" name="vswr_thresholds" value="1.2, 1.5"/>
                      <button class="go" tabindex="0" >Sweep</button>
                  </form>
                  <br/>
