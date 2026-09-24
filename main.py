@@ -12,7 +12,8 @@ import configparser
 import sys
 import os
 import util
-import math, cmath 
+import analysis
+import math, cmath
 
 def load_user_config():
     try:
@@ -27,10 +28,15 @@ def save_user_config():
     with open(static_config["workdir"] + "/userconfig.json", "w") as f:
         json.dump(user_config, f)
 
-VERSION = "5"
+VERSION = "6"
 
-# Determine where the script is actually running from 
-run_base_dir = os.path.dirname(os.path.realpath(__file__))
+# Determine where the script is actually running from. When frozen by
+# PyInstaller, __file__ points into the temporary extraction folder, so
+# use the location of the executable instead.
+if getattr(sys, "frozen", False):
+    run_base_dir = os.path.dirname(os.path.realpath(sys.executable))
+else:
+    run_base_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Check to see if the user specified an explicit base directory
 if len(sys.argv) >= 2:
@@ -51,10 +57,10 @@ logging.info("Base directory is " + base_dir)
 # Make sure the config file and static directories exist
 if not os.path.exists(base_dir + "/config.ini"):
     logging.error("config.ini is not found")
-    quit()
+    sys.exit(1)
 if not os.path.exists(base_dir + "/static"):
     logging.error("static directory is not found")
-    quit()
+    sys.exit(1)
 
 # Load .ini file
 config = configparser.ConfigParser()
@@ -184,12 +190,24 @@ def status():
         nanovna.connect_if_necessary(user_config["port"])
         # Execute various status commands
         vbat_lines = nanovna.run_command("vbat")
-        vbat = float(vbat_lines[0][:-2]) / 1000
+        # Some firmware versions don't support vbat
+        try:
+            vbat = float(vbat_lines[0][:-2]) / 1000
+        except (ValueError, IndexError):
+            logging.warning("Unable to read battery voltage: " + str(vbat_lines))
+            vbat = "N/A"
         version_lines = nanovna.run_command("version")
+        info_lines = nanovna.run_command("info")
+        sn_lines = nanovna.run_command("SN")
+        # Firmware that doesn't support SN echoes back "SN?"
+        if not sn_lines or sn_lines[0].strip() == "SN?":
+            sn_lines = ["N/A"]
 
         result = {
             "version": version_lines[0],
-            "voltage": vbat
+            "voltage": vbat,
+            "info": info_lines,
+            "sn": "\n".join(sn_lines)
         }
         return result
 
@@ -243,22 +261,18 @@ def sweep():
             raise Exception("There are too many steps")
         if step_count == 0:
             raise Exception("There are not enough steps")
+        vswr_thresholds = analysis.parse_vswr_thresholds(request.args.get("vswr_thresholds", ""))
 
-        nanovna.run_command("info")
         nanovna.run_command("recall " + str(cal_preset))
-        # Set the sweep range
-        nanovna.run_command("sweep " + str(start_frequency) + " " + str(end_frequency))
         # Get the battery voltage in volts
         #vbat_lines = nv.run_command(ser, "vbat")
         #vbat = float(vbat_lines[0][:-2]) / 1000
-        
-        # Collect the frequencies of the sweep
-        lines = nanovna.run_command("frequencies")
-        frequency_list = [float(line) for line in lines]
-        # Collect the reflection coefficients of the sweep
-        rc_list = nanovna.get_complex_data()
-        if len(frequency_list) != len(rc_list):
-            raise Exception("Data length error")
+
+        # Measure the frequencies and reflection coefficients of the range
+        frequency_list, rc_list = nanovna.measure_s11(start_frequency, end_frequency)
+
+        # Analyse the full-resolution sweep (before re-sampling) for the summary
+        sweep_analysis = analysis.analyze_sweep(frequency_list, [abs(rc) for rc in rc_list], vswr_thresholds)
 
         # Convert to VSWR
         vswr_list = [nanovna.reflection_coefficient_to_vswr(rc) for rc in rc_list]
@@ -316,6 +330,7 @@ def sweep():
         # Format the result
         result = {
             "error": False,
+            "analysis": sweep_analysis,
             "headers": ["{:.03f}".format(f / 1000000.0) for f in result_frequencies],
             "rows": [
                 {

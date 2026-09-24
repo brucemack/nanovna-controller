@@ -8,3 +8,9 @@ table .number-cell {
     text-align: right;
 }
 
+.analysis h2 {
+    font-size: 1.2em;
+}
+.analysis h3 {
+    font-size: 1em;
+}
