@@ -186,10 +186,17 @@ def status():
         vbat_lines = nanovna.run_command("vbat")
         vbat = float(vbat_lines[0][:-2]) / 1000
         version_lines = nanovna.run_command("version")
+        info_lines = nanovna.run_command("info")
+        sn_lines = nanovna.run_command("SN")
+        # Firmware that doesn't support SN echoes back "SN?"
+        if not sn_lines or sn_lines[0].strip() == "SN?":
+            sn_lines = ["N/A"]
 
         result = {
             "version": version_lines[0],
-            "voltage": vbat
+            "voltage": vbat,
+            "info": info_lines,
+            "sn": "\n".join(sn_lines)
         }
         return result
 

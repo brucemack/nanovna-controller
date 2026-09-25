@@ -68,7 +68,11 @@ Designed by N1FMV and KC1FSZ
         <script id="template_2" type="text/x-handlebars-template">
             <div>
                 <p>Battery voltage: {{voltage}}</p>
-                <p>NanovNA version: {{version}}</p>
+                <p>NanoVNA version: {{version}}</p>
+                <p>Serial number: {{sn}}</p>
+                <p>Info:</p>
+                <pre>{{#each info}}{{this}}
+{{/each}}</pre>
             </div>
         </script>
         <script>
